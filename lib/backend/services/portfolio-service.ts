@@ -1,43 +1,61 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createPublicClient } from "@/lib/supabase/server";
 import { PortfolioRepository } from "../repositories/portfolio-repository";
 import { requireRoles, requireUser, getClientIpAndUserAgent } from "../utils/auth";
 import { portfolioProjectSchema, PortfolioProjectInputType } from "@/lib/validations/cms";
 import { AuditRepository } from "../repositories/audit-repository";
 import { AppError } from "../utils/errors";
+import { MOCK_PORTFOLIO } from "@/lib/supabase/cms";
 
 export const PortfolioService = {
   async getProject(id: string) {
-    const supabase = await createClient();
-    const project = await PortfolioRepository.findById(supabase, id);
-    if (!project) {
+    try {
+      const supabase = await createClient();
+      const project = await PortfolioRepository.findById(supabase, id);
+      if (project) return project;
+    } catch (e) {
+      console.warn(`Database query for project ID "${id}" failed. Falling back to mock data.`, e);
+    }
+    const mockProject = MOCK_PORTFOLIO.find(p => p.id === id);
+    if (!mockProject) {
       throw new AppError("Portfolio project not found", "NOT_FOUND", 404);
     }
-    return project;
+    return mockProject;
   },
 
   async getProjectBySlug(slug: string) {
-    const supabase = await createClient();
-    const project = await PortfolioRepository.findBySlug(supabase, slug);
-    if (!project) {
+    try {
+      const supabase = await createClient();
+      const project = await PortfolioRepository.findBySlug(supabase, slug);
+      if (project) return project;
+    } catch (e) {
+      console.warn(`Database query for project slug "${slug}" failed. Falling back to mock data.`, e);
+    }
+    const mockProject = MOCK_PORTFOLIO.find(p => p.slug === slug);
+    if (!mockProject) {
       throw new AppError("Portfolio project not found", "NOT_FOUND", 404);
     }
-    return project;
+    return mockProject;
   },
 
   async listProjects() {
-    const supabase = await createClient();
-    
-    // Attempt authentication to see if user is staff (can see draft items)
     try {
-      const user = await requireUser();
-      if (["admin", "super-admin", "manager"].includes(user.role)) {
-        return PortfolioRepository.listAllAdmin(supabase);
+      const supabase = await createClient();
+      let projects = [];
+      try {
+        const user = await requireUser();
+        if (["admin", "super-admin", "manager"].includes(user.role)) {
+          projects = await PortfolioRepository.listAllAdmin(supabase);
+        } else {
+          projects = await PortfolioRepository.listPublished(supabase);
+        }
+      } catch {
+        projects = await PortfolioRepository.listPublished(supabase);
       }
-    } catch {
-      // Fall through to public list if unauthenticated or normal user
+      return projects && projects.length > 0 ? projects : MOCK_PORTFOLIO;
+    } catch (e) {
+      console.warn("Database query for portfolio projects list failed. Falling back to mock data.", e);
+      return MOCK_PORTFOLIO;
     }
-
-    return PortfolioRepository.listPublished(supabase);
   },
 
   async createProject(input: PortfolioProjectInputType) {
@@ -132,5 +150,31 @@ export const PortfolioService = {
     });
 
     return true;
+  },
+
+  async listPublishedProjectsOnly() {
+    try {
+      const supabase = createPublicClient();
+      const projects = await PortfolioRepository.listPublished(supabase);
+      return projects && projects.length > 0 ? projects : MOCK_PORTFOLIO;
+    } catch (e) {
+      console.warn("Database query for public portfolio projects list failed. Falling back to mock data.", e);
+      return MOCK_PORTFOLIO;
+    }
+  },
+
+  async getPublishedProjectBySlug(slug: string) {
+    try {
+      const supabase = createPublicClient();
+      const project = await PortfolioRepository.findBySlug(supabase, slug);
+      if (project) return project;
+    } catch (e) {
+      console.warn(`Database query for public project slug "${slug}" failed. Falling back to mock data.`, e);
+    }
+    const mockProject = MOCK_PORTFOLIO.find(p => p.slug === slug);
+    if (!mockProject) {
+      throw new AppError("Portfolio project not found", "NOT_FOUND", 404);
+    }
+    return mockProject;
   }
 };

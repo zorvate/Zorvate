@@ -3,7 +3,8 @@ import Link from "next/link";
 import { ArrowRight, Layers, AppWindow, Cpu } from "lucide-react";
 
 import { SectionWrapper } from "@/components/marketing/section-wrapper";
-import { services } from "@/lib/constants/services";
+import { services as staticServices } from "@/lib/constants/services";
+import { ServiceService } from "@/lib/backend/services/service-service";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
@@ -14,7 +15,10 @@ export const metadata: Metadata = {
 
 const serviceIcons = [AppWindow, Layers, Cpu];
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const dynamicServices = await ServiceService.listServicesPublic();
+  const displayServices = dynamicServices && dynamicServices.length > 0 ? dynamicServices : staticServices;
+
   return (
     <div className="bg-background relative min-h-screen">
       {/* Decorative Orbs */}
@@ -39,8 +43,9 @@ export default function ServicesPage() {
       {/* SERVICES LIST */}
       <SectionWrapper className="border-t bg-muted/5 py-16 md:py-24 relative z-10">
         <div className="mx-auto max-w-6xl grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service, sIdx) => {
+          {displayServices.map((service, sIdx) => {
             const Icon = serviceIcons[sIdx % serviceIcons.length];
+            const shortDesc = (service as { shortDescription?: string }).shortDescription || (service as unknown as { short_description?: string }).short_description || "";
             return (
               <Link
                 key={service.slug}
@@ -57,7 +62,7 @@ export default function ServicesPage() {
                   </h3>
 
                   <p className="mt-4 text-xs sm:text-sm text-muted-foreground leading-relaxed font-medium">
-                    {service.shortDescription}
+                    {shortDesc}
                   </p>
                 </div>
 

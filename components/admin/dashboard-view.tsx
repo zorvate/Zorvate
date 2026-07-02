@@ -137,7 +137,7 @@ export function AdminDashboardView({
                   <div className="text-sm font-bold text-foreground">{contact.name}</div>
                   <div className="text-xs text-muted-foreground mt-1 font-medium">{contact.email}</div>
                 </div>
-                <span className="text-[10px] font-semibold text-muted-foreground select-none">
+                <span suppressHydrationWarning className="text-[10px] font-semibold text-muted-foreground select-none">
                   {new Date(contact.created_at).toLocaleDateString()}
                 </span>
               </motion.div>

@@ -8,7 +8,7 @@ export async function requireAdmin() {
     redirect("/auth/login");
   }
 
-  if (role !== "admin") {
+  if (role !== "admin" && role !== "super-admin") {
     redirect("/portal");
   }
 

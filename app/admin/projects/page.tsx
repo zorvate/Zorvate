@@ -36,6 +36,7 @@ export default function AdminProjects() {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("planning");
   const [success, setSuccess] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -61,26 +62,33 @@ export default function AdminProjects() {
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !clientId) return;
+    if (!name || !clientId || creating) return;
 
-    const res = await createProjectAction({
-      name,
-      description: desc,
-      client_id: clientId,
-      status: status as "planning" | "active" | "completed" | "on_hold",
-      progress,
-    });
+    setCreating(true);
+    try {
+      const res = await createProjectAction({
+        name,
+        description: desc,
+        client_id: clientId,
+        status: status as "planning" | "active" | "completed" | "on_hold",
+        progress,
+      });
 
-    if (!res.success) {
-      alert(`Create error: ${res.error}`);
-    } else {
-      setSuccess(true);
-      setName("");
-      setDesc("");
-      setProgress(0);
-      setStatus("planning");
-      await fetchData();
-      setTimeout(() => setSuccess(false), 3000);
+      if (!res.success) {
+        alert(`Create error: ${res.error}`);
+      } else {
+        setSuccess(true);
+        setName("");
+        setDesc("");
+        setProgress(0);
+        setStatus("planning");
+        await fetchData();
+        setTimeout(() => setSuccess(false), 3000);
+      }
+    } catch (err) {
+      alert(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -254,8 +262,8 @@ export default function AdminProjects() {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full h-10 font-bold">
-                  Initialize Contract
+                <Button type="submit" disabled={creating || !name || !clientId} className="w-full h-10 font-bold">
+                  {creating ? "Initializing..." : "Initialize Contract"}
                 </Button>
               </form>
             </CardContent>

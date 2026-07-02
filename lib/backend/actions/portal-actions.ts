@@ -25,7 +25,7 @@ async function verifyProjectAccess(userId: string, userRole: string, projectId: 
     .select("id")
     .eq("id", projectId)
     .eq("client_id", userId)
-    .single();
+    .maybeSingle();
 
   if (!project) {
     throw new Error("Unauthorized access to this project workspace");

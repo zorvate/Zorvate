@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Save, Coins, Info, Share2, HelpCircle, Star, Plus, Trash2, LayoutGrid, Search, Compass, Anchor } from "lucide-react";
+import { Save, Coins, Info, Share2, HelpCircle, Star, Plus, Trash2, LayoutGrid, Search, Compass, Anchor, Briefcase, Users } from "lucide-react";
 import {
   saveFaqAction,
   deleteFaqAction,
@@ -10,9 +10,15 @@ import {
   saveSiteSettingAction,
   getRawSiteSettingsAction,
   getFaqsAction,
-  getTestimonialsAction
+  getTestimonialsAction,
+  listServicesAction,
+  listTeamMembersAction,
+  saveServiceAction,
+  deleteServiceAction,
+  saveTeamMemberAction,
+  deleteTeamMemberAction
 } from "@/lib/backend/actions/cms-actions";
-import { SiteSetting, Faq, Testimonial } from "@/lib/supabase/cms";
+import { SiteSetting, Faq, Testimonial, Service, TeamMember } from "@/lib/supabase/cms";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,10 +28,12 @@ import { Textarea } from "@/components/ui/textarea";
 export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<"metrics" | "company" | "socials" | "hero" | "seo" | "navlinks" | "footerlinks" | "faqs" | "testimonials">("metrics");
+  const [activeTab, setActiveTab] = useState<"metrics" | "company" | "socials" | "hero" | "seo" | "navlinks" | "footerlinks" | "faqs" | "testimonials" | "services" | "team">("metrics");
   const [settings, setSettings] = useState<SiteSetting[]>([]);
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
   // Navigation and footer dynamic link list states
   const [navLinks, setNavLinks] = useState<{ title: string; href: string }[]>([]);
@@ -37,6 +45,10 @@ export default function AdminSettingsPage() {
   // Testimonial modal/editing states
   const [editingTestimonial, setEditingTestimonial] = useState<Partial<Testimonial> | null>(null);
 
+  // Service & Team editing states
+  const [editingService, setEditingService] = useState<Partial<Service> | null>(null);
+  const [editingTeam, setEditingTeam] = useState<Partial<TeamMember> | null>(null);
+
   useEffect(() => {
     async function loadData() {
       setLoading(true);
@@ -44,6 +56,8 @@ export default function AdminSettingsPage() {
         const settingsRes = await getRawSiteSettingsAction();
         const faqsRes = await getFaqsAction();
         const testimonialsRes = await getTestimonialsAction();
+        const servicesRes = await listServicesAction();
+        const teamRes = await listTeamMembersAction();
 
         if (settingsRes.success) {
           setSettings(settingsRes.data);
@@ -59,6 +73,8 @@ export default function AdminSettingsPage() {
         }
         if (faqsRes.success) setFaqs(faqsRes.data);
         if (testimonialsRes.success) setTestimonials(testimonialsRes.data);
+        if (servicesRes.success) setServices(servicesRes.data);
+        if (teamRes.success) setTeamMembers(teamRes.data);
       } catch (e) {
         console.error("Error loading settings:", e);
       } finally {
@@ -76,6 +92,16 @@ export default function AdminSettingsPage() {
   const refreshTestimonials = async () => {
     const res = await getTestimonialsAction();
     if (res.success) setTestimonials(res.data);
+  };
+
+  const refreshServices = async () => {
+    const res = await listServicesAction();
+    if (res.success) setServices(res.data);
+  };
+
+  const refreshTeam = async () => {
+    const res = await listTeamMembersAction();
+    if (res.success) setTeamMembers(res.data);
   };
 
   const handleSettingChange = (key: string, value: string) => {
@@ -197,6 +223,72 @@ export default function AdminSettingsPage() {
     }
   };
 
+  // Services CRUD
+  const handleSaveServiceSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingService) return;
+    try {
+      const payload = {
+        id: editingService.id,
+        slug: editingService.slug || "",
+        title: editingService.title || "",
+        short_description: editingService.shortDescription || "",
+        description: editingService.description || "",
+        features: editingService.features || [],
+        display_order: Number(editingService.display_order || 0),
+      };
+      const res = await saveServiceAction(payload);
+      if (!res.success) throw new Error(res.error);
+      setEditingService(null);
+      await refreshServices();
+    } catch (err) {
+      alert(`Error saving service: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+
+  const handleDeleteService = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this service?")) return;
+    try {
+      const res = await deleteServiceAction(id);
+      if (!res.success) throw new Error(res.error);
+      await refreshServices();
+    } catch (err) {
+      alert(`Error deleting service: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+
+  // Team CRUD
+  const handleSaveTeamSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTeam) return;
+    try {
+      const payload = {
+        id: editingTeam.id,
+        name: editingTeam.name || "",
+        role: editingTeam.role || "",
+        image_url: editingTeam.image_url || "",
+        display_order: Number(editingTeam.display_order || 0),
+      };
+      const res = await saveTeamMemberAction(payload);
+      if (!res.success) throw new Error(res.error);
+      setEditingTeam(null);
+      await refreshTeam();
+    } catch (err) {
+      alert(`Error saving team member: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+
+  const handleDeleteTeam = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this team member?")) return;
+    try {
+      const res = await deleteTeamMemberAction(id);
+      if (!res.success) throw new Error(res.error);
+      await refreshTeam();
+    } catch (err) {
+      alert(`Error deleting team member: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+
   // Links List CRUD Helpers
   const handleAddLink = (type: "nav" | "footer") => {
     const list = type === "nav" ? navLinks : footerLinks;
@@ -312,6 +404,8 @@ export default function AdminSettingsPage() {
             { id: "socials", label: "Socials", icon: Share2 },
             { id: "faqs", label: "FAQ Desk", icon: HelpCircle },
             { id: "testimonials", label: "Reviews", icon: Star },
+            { id: "services", label: "Services CMS", icon: Briefcase },
+            { id: "team", label: "Team CMS", icon: Users },
           ].map((tab) => {
             const Icon = tab.icon;
             return (
@@ -613,6 +707,121 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
             )}
+ 
+            {/* SERVICES CMS MANAGER */}
+            {activeTab === "services" && (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-bold tracking-tight">Active Services</h2>
+                  <Button
+                    onClick={() => setEditingService({ slug: "", title: "", shortDescription: "", description: "", features: [], display_order: services.length })}
+                    size="sm"
+                    className="flex items-center gap-1 h-8 text-xs font-bold"
+                  >
+                    <Plus size={13} /> Add Service
+                  </Button>
+                </div>
+
+                <div className="border border-border/80 rounded-2xl bg-card overflow-hidden divide-y divide-border/60">
+                  {services.map((service, sIdx) => (
+                    <div key={service.id || sIdx} className="p-4 flex justify-between items-start hover:bg-white/5 transition-colors gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-xs font-black text-foreground">{service.title}</h4>
+                          <span className="text-[10px] text-muted-foreground">({service.slug})</span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed font-semibold">
+                          {(service as unknown as { short_description?: string }).short_description || service.shortDescription || ""}
+                        </p>
+                      </div>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <Button
+                          onClick={() => setEditingService(service)}
+                          variant="outline"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                        >
+                          <Plus size={12} className="rotate-45" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteService(service.id)}
+                          variant="outline"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10 border-destructive/20"
+                        >
+                          <Trash2 size={12} />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  {services.length === 0 && (
+                    <div className="p-8 text-center text-xs text-muted-foreground italic font-semibold">No services configured.</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TEAM CMS MANAGER */}
+            {activeTab === "team" && (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-bold tracking-tight">Team Roster</h2>
+                  <Button
+                    onClick={() => setEditingTeam({ name: "", role: "", image_url: "", display_order: teamMembers.length })}
+                    size="sm"
+                    className="flex items-center gap-1 h-8 text-xs font-bold"
+                  >
+                    <Plus size={13} /> Add Member
+                  </Button>
+                </div>
+
+                <div className="border border-border/80 rounded-2xl bg-card overflow-hidden divide-y divide-border/60">
+                  {teamMembers.map((member, mIdx) => (
+                    <div key={member.id || mIdx} className="p-4 flex justify-between items-start hover:bg-white/5 transition-colors gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden border border-border/60">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={member.image_url}
+                            alt={member.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Elegant fallback if image fails to load
+                              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face";
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-0.5">
+                          <h4 className="text-xs font-black text-foreground">{member.name}</h4>
+                          <p className="text-[10px] text-primary font-bold">{member.role}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <Button
+                          onClick={() => setEditingTeam(member)}
+                          variant="outline"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                        >
+                          <Plus size={12} className="rotate-45" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteTeam(member.id)}
+                          variant="outline"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10 border-destructive/20"
+                        >
+                          <Trash2 size={12} />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  {teamMembers.length === 0 && (
+                    <div className="p-8 text-center text-xs text-muted-foreground italic font-semibold">No team members configured.</div>
+                  )}
+                </div>
+              </div>
+            )}
 
           </div>
 
@@ -737,6 +946,140 @@ export default function AdminSettingsPage() {
                     <div className="flex gap-2 pt-2">
                       <Button type="submit" className="flex-grow">Save Review</Button>
                       <Button type="button" variant="outline" onClick={() => setEditingTestimonial(null)}>Cancel</Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* SERVICE EDITOR PANEL */}
+            {editingService && (
+              <Card className="border bg-card">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold">
+                    {editingService.id ? "Edit Service" : "Create Service"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSaveServiceSubmit} className="space-y-4 text-xs font-semibold">
+                    <div className="space-y-1">
+                      <Label htmlFor="s_title">Service Title</Label>
+                      <Input
+                        id="s_title"
+                        value={editingService.title || ""}
+                        onChange={(e) => setEditingService({ ...editingService, title: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="s_slug">Slug (lowercase, hyphens)</Label>
+                      <Input
+                        id="s_slug"
+                        value={editingService.slug || ""}
+                        onChange={(e) => setEditingService({ ...editingService, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })}
+                        required
+                        placeholder="e.g. cloud-deployment"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="s_short_desc">Short Description (Max 200 chars)</Label>
+                      <Input
+                        id="s_short_desc"
+                        value={editingService.shortDescription || ""}
+                        onChange={(e) => setEditingService({ ...editingService, shortDescription: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="s_desc">Detailed Description</Label>
+                      <Textarea
+                        id="s_desc"
+                        rows={4}
+                        value={editingService.description || ""}
+                        onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="s_features">Features / Scope items (comma separated)</Label>
+                      <Input
+                        id="s_features"
+                        value={(editingService.features || []).join(", ")}
+                        onChange={(e) => setEditingService({ ...editingService, features: e.target.value.split(",").map(item => item.trim()).filter(Boolean) })}
+                        placeholder="e.g. Auth flow, DB Migrations, Stripe Setup"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="s_order">Display Weight</Label>
+                      <Input
+                        id="s_order"
+                        type="number"
+                        value={editingService.display_order || 0}
+                        onChange={(e) => setEditingService({ ...editingService, display_order: Number(e.target.value) })}
+                      />
+                    </div>
+                    
+                    <div className="flex gap-2 pt-2">
+                      <Button type="submit" className="flex-grow">Save Service</Button>
+                      <Button type="button" variant="outline" onClick={() => setEditingService(null)}>Cancel</Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* TEAM MEMBER EDITOR PANEL */}
+            {editingTeam && (
+              <Card className="border bg-card">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold">
+                    {editingTeam.id ? "Edit Team Member" : "Add Team Member"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSaveTeamSubmit} className="space-y-4 text-xs font-semibold">
+                    <div className="space-y-1">
+                      <Label htmlFor="team_name">Full Name</Label>
+                      <Input
+                        id="team_name"
+                        value={editingTeam.name || ""}
+                        onChange={(e) => setEditingTeam({ ...editingTeam, name: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="team_role">Role / Position</Label>
+                      <Input
+                        id="team_role"
+                        value={editingTeam.role || ""}
+                        onChange={(e) => setEditingTeam({ ...editingTeam, role: e.target.value })}
+                        required
+                        placeholder="e.g. Principal Architect"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="team_image">Image URL</Label>
+                      <Input
+                        id="team_image"
+                        value={editingTeam.image_url || ""}
+                        onChange={(e) => setEditingTeam({ ...editingTeam, image_url: e.target.value })}
+                        required
+                        placeholder="https://images.unsplash.com/..."
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="team_order">Display Weight</Label>
+                      <Input
+                        id="team_order"
+                        type="number"
+                        value={editingTeam.display_order || 0}
+                        onChange={(e) => setEditingTeam({ ...editingTeam, display_order: Number(e.target.value) })}
+                      />
+                    </div>
+                    
+                    <div className="flex gap-2 pt-2">
+                      <Button type="submit" className="flex-grow">Save Member</Button>
+                      <Button type="button" variant="outline" onClick={() => setEditingTeam(null)}>Cancel</Button>
                     </div>
                   </form>
                 </CardContent>

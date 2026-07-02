@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
-import { services } from "@/lib/constants/services";
+import { services as staticServices } from "@/lib/constants/services";
+import { ServiceService } from "@/lib/backend/services/service-service";
 import { SectionWrapper } from "@/components/marketing/section-wrapper";
+import { Service } from "@/lib/supabase/cms";
 
 type Props = {
   params: Promise<{
@@ -10,14 +12,31 @@ type Props = {
   }>;
 };
 
+export async function generateStaticParams() {
+  const dynamicServices = await ServiceService.listServicesPublic();
+  const dynamicSlugs = dynamicServices.map((s) => ({ slug: s.slug }));
+  const staticSlugs = staticServices.map((s) => ({ slug: s.slug }));
+  
+  const allSlugs = [...dynamicSlugs, ...staticSlugs];
+  const uniqueSlugs = allSlugs.filter(
+    (value, index, self) => self.findIndex((t) => t.slug === value.slug) === index
+  );
+  return uniqueSlugs;
+}
+
 export default async function ServicePage({ params }: Props) {
   const { slug } = await params;
 
-  const service = services.find((item) => item.slug === slug);
+  let service = (await ServiceService.getServiceBySlugPublic(slug)) as Service | null;
+  if (!service) {
+    service = (staticServices.find((item) => item.slug === slug) as Service | undefined) || null;
+  }
 
   if (!service) {
     notFound();
   }
+
+
 
   return (
     <div className="bg-background relative min-h-screen">
@@ -57,7 +76,7 @@ export default async function ServicePage({ params }: Props) {
           </h2>
 
           <div className="grid sm:grid-cols-2 gap-4">
-            {service.features.map((feature) => (
+            {service.features.map((feature: string) => (
               <div
                 key={feature}
                 className="p-5 border rounded-2xl bg-card/45 backdrop-blur-md glass-panel flex items-start gap-3 hover:border-primary/15 transition-all"

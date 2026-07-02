@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createPublicClient } from "@/lib/supabase/server";
 import { ServiceRepository } from "../repositories/service-repository";
 import { requireRoles, getClientIpAndUserAgent } from "../utils/auth";
 import { serviceSchema, ServiceInputType } from "@/lib/validations/cms";
@@ -112,5 +112,26 @@ export const ServiceService = {
     });
 
     return true;
+  },
+
+  async listServicesPublic() {
+    try {
+      const supabase = createPublicClient();
+      return await ServiceRepository.listAll(supabase);
+    } catch (e) {
+      console.warn("Database query for services list failed. Falling back.", e);
+      return [];
+    }
+  },
+
+  async getServiceBySlugPublic(slug: string) {
+    try {
+      const supabase = createPublicClient();
+      const service = await ServiceRepository.findBySlug(supabase, slug);
+      if (service) return service;
+    } catch (e) {
+      console.warn(`Database query for service slug "${slug}" failed.`, e);
+    }
+    return null;
   }
 };

@@ -9,9 +9,16 @@ type Props = {
   }>;
 };
 
+export async function generateStaticParams() {
+  const projects = await PortfolioService.listPublishedProjectsOnly();
+  return projects.map((project) => ({
+    slug: project.slug,
+  }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = await PortfolioService.getProjectBySlug(slug);
+  const project = await PortfolioService.getPublishedProjectBySlug(slug);
   if (!project) return {};
 
   return {
@@ -22,7 +29,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PortfolioDetailPage({ params }: Props) {
   const { slug } = await params;
-  const project = await PortfolioService.getProjectBySlug(slug);
+  const project = await PortfolioService.getPublishedProjectBySlug(slug);
+
 
   if (!project || project.status !== "published") {
     notFound();

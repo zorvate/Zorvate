@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PortfolioPage() {
-  const projects = await PortfolioService.listProjects();
+  const projects = await PortfolioService.listPublishedProjectsOnly();
 
   return (
     <div className="bg-background relative min-h-screen">

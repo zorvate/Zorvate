@@ -1,13 +1,25 @@
-"use client";
-
 import { Compass, Eye, ShieldCheck, Zap, Handshake, Sparkles } from "lucide-react";
+import { Metadata } from "next";
+import Image from "next/image";
 
 import { SectionWrapper } from "@/components/marketing/section-wrapper";
 import { ParticlesBackdrop } from "@/components/ui/particles-backdrop";
 import { SpotlightGlow } from "@/components/ui/spotlight-glow";
 import { GlassCard } from "@/components/ui/glass-card";
+import { TeamService } from "@/lib/backend/services/team-service";
+import { MOCK_TEAM } from "@/lib/supabase/cms";
+import { siteConfig } from "@/config/site";
 
-export default function AboutPage() {
+export const metadata: Metadata = {
+  title: `About Studio | ${siteConfig.name}`,
+  description:
+    "Zorvate is a premium design and frontend studio dedicated to turning ambitious concept roadmaps into responsive websites.",
+};
+
+export default async function AboutPage() {
+  const dynamicTeam = await TeamService.listTeamMembersPublic();
+  const team = dynamicTeam && dynamicTeam.length > 0 ? dynamicTeam : MOCK_TEAM;
+
   return (
     <div className="bg-background relative min-h-screen text-foreground">
       {/* HERO SECTION */}
@@ -116,6 +128,42 @@ export default function AboutPage() {
                 </GlassCard>
               );
             })}
+          </div>
+        </div>
+      </SectionWrapper>
+
+      {/* MEET OUR TEAM SECTION */}
+      <SectionWrapper className="border-t bg-muted/5 py-16 md:py-24 relative z-10">
+        <div className="mx-auto max-w-5xl space-y-12">
+          <div className="text-center select-none">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">Meet Our Team</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-2 font-medium">
+              The creative minds and technical builders behind our agency deliverables.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
+            {team.map((member) => (
+              <GlassCard
+                key={member.id}
+                tilt={true}
+                tiltMaxAngle={4}
+                className="p-6 border bg-card/25 flex flex-col items-center text-center group hover:border-primary/20 transition-all duration-300"
+              >
+                <div className="relative w-24 h-24 rounded-full overflow-hidden mb-6 border-2 border-primary/20 group-hover:border-primary/50 transition-all duration-300 shadow-md">
+                  <Image
+                    src={member.image_url}
+                    alt={`${member.name} - ${member.role}`}
+                    width={96}
+                    height={96}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    unoptimized
+                  />
+                </div>
+                <h3 className="font-bold text-base text-foreground tracking-tight">{member.name}</h3>
+                <p className="text-xs font-semibold text-primary mt-1">{member.role}</p>
+              </GlassCard>
+            ))}
           </div>
         </div>
       </SectionWrapper>

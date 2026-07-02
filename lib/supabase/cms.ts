@@ -42,6 +42,18 @@ export interface PortfolioProject {
   description: string;
   image_url: string;
   display_order: number;
+  featured?: boolean;
+  status?: 'draft' | 'published';
+  technologies?: string[] | null;
+  challenge?: string | null;
+  solution?: string | null;
+  testimonial_quote?: string | null;
+  testimonial_author?: string | null;
+  testimonial_role?: string | null;
+  metrics?: { label: string; value: number; suffix: string }[] | null;
+  process_steps?: { phase: string; title: string; desc: string }[] | null;
+  client_name?: string | null;
+  project_date?: string | null;
 }
 
 export interface Job {
@@ -195,7 +207,28 @@ export const MOCK_PORTFOLIO: PortfolioProject[] = [
     category: "Web Application",
     description: "A scalable SaaS dashboard built with Next.js, TypeScript, and Supabase.",
     image_url: "/images/portfolio/saas-dashboard.jpg",
-    display_order: 0
+    display_order: 0,
+    featured: true,
+    status: "published",
+    technologies: ["Next.js", "TypeScript", "Supabase", "Tailwind CSS", "Framer Motion"],
+    challenge: "The client's legacy dashboard suffered from heavy bundle sizes, slow SQL querying times, and a dated visual style that led to user churn. They needed a state-of-the-art interface that felt immediate and secure.",
+    solution: "We engineered a server-side-rendered Next.js core backed by a secure PostgreSQL database, optimized query caching, and automated billing callbacks via Stripe. We integrated fluid motion layers to keep users engaged.",
+    testimonial_quote: "Zorvate completely transformed our visual product. The load speed dropped dramatically and our users love the dashboard.",
+    testimonial_author: "Ammar Jaffri",
+    testimonial_role: "CEO, FinTech SaaS Corp",
+    metrics: [
+      { label: "Platform Uptime", value: 99.99, suffix: "%" },
+      { label: "Page Load Speed", value: 0.38, suffix: "s" },
+      { label: "User Engagement", value: 145, suffix: "%" }
+    ],
+    process_steps: [
+      { phase: "Phase 01", title: "Strategy & Interface Mapping", desc: "Mapped client profiles and set up security boundaries." },
+      { phase: "Phase 02", title: "Visual Prototyping", desc: "Designed premium glassmorphic UI cards in Figma." },
+      { phase: "Phase 03", title: "Dashboard Coding", desc: "Built the dashboard panels and real-time event updates." },
+      { phase: "Phase 04", title: "Performance Tuning", desc: "Achieved sub-second page loads and compiled final bundles." }
+    ],
+    client_name: "FinTech SaaS Corp",
+    project_date: "2025-06-15"
   },
   {
     id: "port-2",
@@ -204,7 +237,28 @@ export const MOCK_PORTFOLIO: PortfolioProject[] = [
     category: "Marketing Website",
     description: "A high-converting agency website focused on SEO and lead generation.",
     image_url: "/images/portfolio/agency-website.jpg",
-    display_order: 1
+    display_order: 1,
+    featured: true,
+    status: "published",
+    technologies: ["Next.js", "React", "Tailwind CSS v4", "Framer Motion", "Netlify"],
+    challenge: "A highly static online brochure that loaded slowly on mobile and failed to capture leads or drive user engagement. It lacked emotional appeal and failed to express the brand's premium identity.",
+    solution: "We built a fully static Next.js export with Tailwind CSS v4 layout tokens, highly responsive fluid animations, and a structured Netlify deployment. We added interactive overlays and magnetic button hooks.",
+    testimonial_quote: "Working with Zorvate was a game-changer. The conversion rate of our landing pages increased immediately.",
+    testimonial_author: "Sarah Ahmed",
+    testimonial_role: "Marketing VP, Creative Ltd",
+    metrics: [
+      { label: "Lighthouse Score", value: 100, suffix: "" },
+      { label: "Lead Conversions", value: 320, suffix: "%" },
+      { label: "Time-to-Interactive", value: 1.1, suffix: "s" }
+    ],
+    process_steps: [
+      { phase: "Phase 01", title: "Brand Alignment", desc: "Defined color palettes, typography guidelines, and transition metrics." },
+      { phase: "Phase 02", title: "Layout Protyping", desc: "Composed complex grid layouts with scroll indicators." },
+      { phase: "Phase 03", title: "Animation Sprints", desc: "Implemented magnetic effects and particle canvas layers." },
+      { phase: "Phase 04", title: "Deployment Audit", desc: "Validated responsive grid elements and metadata schemas." }
+    ],
+    client_name: "Creative Branding Ltd",
+    project_date: "2025-08-20"
   },
   {
     id: "port-3",
@@ -213,7 +267,28 @@ export const MOCK_PORTFOLIO: PortfolioProject[] = [
     category: "Business System",
     description: "A secure client portal with project tracking, files, and messaging.",
     image_url: "/images/portfolio/client-portal.jpg",
-    display_order: 2
+    display_order: 2,
+    featured: true,
+    status: "published",
+    technologies: ["Next.js", "Supabase", "Tailwind CSS", "TypeScript", "WebSockets"],
+    challenge: "Legacy file delivery processes relied on insecure email threads and manual sheets, creating operational bottleneck delays and exposing sensitive client documents.",
+    solution: "Next.js App Router workspace coupled to a secure cloud storage container, real-time message tables, and multi-tenant admin levels. Documents are isolated using cryptographically secure user workspaces.",
+    testimonial_quote: "We needed an enterprise-grade file vault portal that was fast and secure. Zorvate delivered beyond expectations.",
+    testimonial_author: "Zainab Malik",
+    testimonial_role: "COO, Apex Group",
+    metrics: [
+      { label: "Assets Encrypted", value: 10000, suffix: "+" },
+      { label: "Platform Reliability", value: 99.9, suffix: "%" },
+      { label: "Average Load Speed", value: 0.28, suffix: "s" }
+    ],
+    process_steps: [
+      { phase: "Phase 01", title: "Security Blueprint", desc: "Designed strict profile relations and workspace partitions." },
+      { phase: "Phase 02", title: "Vault Architecture", desc: "Created secure storage bucket parameters." },
+      { phase: "Phase 03", title: "Collaborative Coding", desc: "Built files uploading nodes and real-time message boards." },
+      { phase: "Phase 04", title: "Compliance Review", desc: "Verified file vault integrity under concurrent loads." }
+    ],
+    client_name: "Apex Management Group",
+    project_date: "2025-11-10"
   }
 ];
 
@@ -268,8 +343,17 @@ export const MOCK_SITE_SETTINGS: Record<string, string> = {
   social_facebook: "https://facebook.com/zorvate",
   social_twitter: "https://twitter.com/zorvate",
   social_github: "https://github.com/zorvate",
-  social_linkedin: "https://linkedin.com/company/zorvate"
+  social_linkedin: "https://linkedin.com/company/zorvate",
+  hero_title: "High-Fidelity Software Engineering Studio",
+  hero_subtitle: "We design and build bespoke software platforms, analytics workspaces, and high-performance user interfaces for startups and enterprise teams.",
+  hero_cta_text: "Initiate Consultation",
+  seo_title: "Zorvate — High-Fidelity Software Engineering Studio",
+  seo_description: "We design and build bespoke software platforms, analytics workspaces, and high-performance user interfaces for startups and enterprise teams.",
+  seo_keywords: "software development, next.js, react, supabase, postgresql, tailwind css, design systems, digital agency, startup-friendly",
+  navigation_links: '[{"title": "About Studio", "href": "/about"}, {"title": "Services", "href": "/services"}, {"title": "Portfolio", "href": "/portfolio"}, {"title": "Pricing Desk", "href": "/pricing"}, {"title": "Careers", "href": "/careers"}, {"title": "Contact Desk", "href": "/contact"}]',
+  footer_links: '[{"title": "About Studio", "href": "/about"}, {"title": "Digital Services", "href": "/services"}, {"title": "Portfolio Archive", "href": "/portfolio"}, {"title": "Contact Desk", "href": "/contact"}]'
 };
+
 
 // ==========================================
 // CMS RETRIEVAL FUNCTIONS (Graceful DB Fallbacks)

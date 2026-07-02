@@ -18,13 +18,19 @@ import {
   PricingFeature,
   PricingComparison
 } from "@/lib/supabase/pricing";
+import {
+  pricingPlanSchema,
+  pricingFeatureSchema,
+  pricingComparisonSchema
+} from "@/lib/validations/pricing";
 
 export async function savePlanAction(plan: Partial<PricingPlan>) {
   return handleAction(async () => {
     const user = await requireRoles(["admin", "super-admin"]);
+    const validated = pricingPlanSchema.parse(plan);
     const supabase = await createClient();
 
-    const result = await savePlan(supabase, plan);
+    const result = await savePlan(supabase, validated as Partial<PricingPlan>);
 
     // Audit log
     const { ip, userAgent } = await getClientIpAndUserAgent();
@@ -72,9 +78,10 @@ export async function deletePlanAction(id: string) {
 export async function saveFeatureAction(feature: Partial<PricingFeature>) {
   return handleAction(async () => {
     const user = await requireRoles(["admin", "super-admin"]);
+    const validated = pricingFeatureSchema.parse(feature);
     const supabase = await createClient();
 
-    const result = await saveFeature(supabase, feature);
+    const result = await saveFeature(supabase, validated as Partial<PricingFeature>);
 
     // Audit log
     const { ip, userAgent } = await getClientIpAndUserAgent();
@@ -121,9 +128,10 @@ export async function deleteFeatureAction(id: string) {
 export async function saveComparisonAction(comp: Partial<PricingComparison>) {
   return handleAction(async () => {
     const user = await requireRoles(["admin", "super-admin"]);
+    const validated = pricingComparisonSchema.parse(comp);
     const supabase = await createClient();
 
-    const result = await saveComparison(supabase, comp);
+    const result = await saveComparison(supabase, validated as Partial<PricingComparison>);
 
     // Audit log
     const { ip, userAgent } = await getClientIpAndUserAgent();

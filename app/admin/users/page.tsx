@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { listProfilesAction, updateProfileAction } from "@/lib/backend/actions/profile-actions";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
-const rolesList = ["client", "admin", "manager", "developer", "designer"];
+const rolesList = ["client", "admin", "super-admin", "manager", "developer", "designer"];
 
 interface UserProfile {
   id: string;

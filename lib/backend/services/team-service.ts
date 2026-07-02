@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createPublicClient } from "@/lib/supabase/server";
 import { TeamRepository } from "../repositories/team-repository";
 import { requireRoles, getClientIpAndUserAgent } from "../utils/auth";
 import { teamMemberSchema, TeamMemberInputType } from "@/lib/validations/cms";
@@ -9,6 +9,16 @@ export const TeamService = {
   async listTeamMembers() {
     const supabase = await createClient();
     return TeamRepository.listAll(supabase);
+  },
+
+  async listTeamMembersPublic() {
+    try {
+      const supabase = createPublicClient();
+      return await TeamRepository.listAll(supabase);
+    } catch (e) {
+      console.warn("Database query for public team members failed.", e);
+      return [];
+    }
   },
 
   async createTeamMember(input: TeamMemberInputType) {

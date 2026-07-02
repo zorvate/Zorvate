@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 import { env } from "@/lib/env/server";
 
@@ -28,3 +29,10 @@ export async function createClient() {
     }
   );
 }
+
+export function createPublicClient() {
+  return createSupabaseClient(
+    env.NEXT_PUBLIC_SUPABASE_URL as string,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+  );
+}

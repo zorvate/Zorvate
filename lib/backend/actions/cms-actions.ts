@@ -210,3 +210,18 @@ export async function listPortfolioProjectsAction() {
     return PortfolioService.listProjects();
   });
 }
+
+export async function listServicesAction() {
+  return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
+    return ServiceService.listServices();
+  });
+}
+
+export async function listTeamMembersAction() {
+  return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
+    return TeamService.listTeamMembers();
+  });
+}
+
