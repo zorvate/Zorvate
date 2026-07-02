@@ -52,6 +52,7 @@ export const portfolioProjectSchema = z.object({
   image_url: z.string().url("Invalid image URL format").or(z.string().min(1)).optional().nullable(),
   gallery_urls: z.array(z.string()).default([]),
   video_url: z.string().url("Invalid video URL").or(z.string().min(1)).optional().nullable(),
+  live_url: z.string().url("Invalid live URL format").or(z.string().min(1)).optional().nullable(),
   technologies: z.array(z.string()).default([]),
   featured: z.boolean().default(false),
   status: z.enum(["draft", "published"]).default("draft"),

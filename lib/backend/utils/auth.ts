@@ -23,19 +23,25 @@ export async function requireUser(): Promise<AuthenticatedUser> {
     .eq("id", user.id)
     .single();
 
+  const devAdminEmail = process.env.NEXT_PUBLIC_DEV_ADMIN_EMAIL || process.env.DEV_ADMIN_EMAIL;
+  let defaultRole = "client";
+  if (user.email && devAdminEmail && user.email.toLowerCase() === devAdminEmail.toLowerCase()) {
+    defaultRole = "super-admin";
+  }
+
   if (profileError || !profile) {
     // If user exists in Auth but profiles table fetch failed, default to 'client' role
     return {
       id: user.id,
       email: user.email,
-      role: "client",
+      role: defaultRole,
     };
   }
 
   return {
     id: user.id,
     email: user.email,
-    role: profile.role || "client",
+    role: (user.email && devAdminEmail && user.email.toLowerCase() === devAdminEmail.toLowerCase()) ? "super-admin" : (profile.role || "client"),
     fullName: profile.full_name,
     avatarUrl: profile.avatar_url,
   };

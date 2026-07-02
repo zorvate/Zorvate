@@ -57,7 +57,12 @@ export default function LoginPage() {
           .eq("id", user.id)
           .single();
         const role = profile?.role || "client";
-        const normalizedRole = role.toLowerCase().replace(/_/g, "-");
+        let normalizedRole = role.toLowerCase().replace(/_/g, "-");
+        const devAdminEmail = process.env.NEXT_PUBLIC_DEV_ADMIN_EMAIL;
+        if (user.email && devAdminEmail && user.email.toLowerCase() === devAdminEmail.toLowerCase()) {
+          normalizedRole = "super-admin";
+        }
+        
         if (normalizedRole === "admin" || normalizedRole === "super-admin") {
           router.push("/admin");
         } else {

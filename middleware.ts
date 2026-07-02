@@ -51,6 +51,10 @@ export async function middleware(request: NextRequest) {
     if (profile?.role) {
       userRole = profile.role.toLowerCase().replace(/_/g, "-");
     }
+    const devAdminEmail = process.env.NEXT_PUBLIC_DEV_ADMIN_EMAIL || process.env.DEV_ADMIN_EMAIL;
+    if (user.email && devAdminEmail && user.email.toLowerCase() === devAdminEmail.toLowerCase()) {
+      userRole = "super-admin";
+    }
   }
 
   if (!user && (isAdminRoute || isPortalRoute)) {

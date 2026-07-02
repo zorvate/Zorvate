@@ -54,6 +54,8 @@ export interface PortfolioProject {
   process_steps?: { phase: string; title: string; desc: string }[] | null;
   client_name?: string | null;
   project_date?: string | null;
+  live_url?: string | null;
+  content?: string | null;
 }
 
 export interface Job {
