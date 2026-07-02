@@ -29,18 +29,16 @@
     }
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
-  ],
-  "exclude": [
+  "next-env.d.ts",
+  "**/*.ts",
+  "**/*.tsx",
+  ".next/types/**/*.ts",
+  ".next/dev/types/**/*.ts",
+  "**/*.mts"
+],
+"exclude": [
     "node_modules",
-    "check-regions.ts",
-    "test-pg.ts",
-    "check-openapi.ts"
- "scripts/debug"
+    "scripts",
+    "scripts/**/*"
   ]
 }
