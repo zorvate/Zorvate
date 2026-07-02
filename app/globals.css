@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+/* =========================================
+   DESIGN TOKENS — MIDNIGHT LUXURY (Tailwind v4)
+   ========================================= */
+@theme {
+  --color-background: #09090B;
+  --color-foreground: #F4F4F5;
+
+  --color-card: rgba(17, 17, 27, 0.65);
+  --color-card-foreground: #F4F4F5;
+
+  --color-primary: #6D28D9;
+  --color-primary-foreground: #F4F4F5;
+
+  --color-secondary: #111827;
+  --color-secondary-foreground: #E4E4E7;
+
+  --color-muted: #18181B;
+  --color-muted-foreground: #A1A1AA;
+
+  --color-accent: #A855F7;
+  --color-accent-foreground: #F4F4F5;
+
+  --color-destructive: #EF4444;
+  --color-destructive-foreground: #F4F4F5;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-input: #18181B;
+  --color-ring: #6D28D9;
+
+  --radius-lg: 1.25rem; /* 20px Card Radius */
+  --radius-md: 0.75rem; /* 12px Button Radius */
+  --radius-sm: 0.5rem;  /* 8px */
+
+  /* Spacing Scale Tokens */
+  --spacing-container-max: 80rem; /* 1280px */
+  
+  /* Transition & Easing Tokens */
+  --transition-premium: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Shadow & Glow Tokens */
+  --shadow-premium-glow: 0 0 40px -10px rgba(109, 40, 217, 0.3);
+  --shadow-accent-glow: 0 0 40px -10px rgba(168, 85, 247, 0.35);
+
+  /* Animation Primitives */
+  --animate-float: float 8s ease-in-out infinite;
+  --animate-float-delayed: float 8s ease-in-out infinite 4s;
+  --animate-pulse-slow: pulseSlow 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-gradient-shift: gradientShift 10s ease infinite;
+  --animate-spin-slow: spin 20s linear infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(1deg); }
+  }
+  @keyframes pulseSlow {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(1.05); }
+  }
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+}
+
+/* Force Midnight Luxury Dark Mode Variables */
+.dark {
+  --color-background: #09090B;
+  --color-foreground: #F4F4F5;
+  --color-card: rgba(17, 17, 27, 0.65);
+  --color-card-foreground: #F4F4F5;
+  --color-primary: #6D28D9;
+  --color-primary-foreground: #F4F4F5;
+  --color-secondary: #111827;
+  --color-secondary-foreground: #E4E4E7;
+  --color-muted: #18181B;
+  --color-muted-foreground: #A1A1AA;
+  --color-accent: #A855F7;
+  --color-accent-foreground: #F4F4F5;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-input: #18181B;
+  --color-ring: #6D28D9;
+}
+
+/* =========================================
+   BASE STYLES & INTERACTIVE GLOW EFFECTS
+   ========================================= */
+@layer base {
+  * {
+    @apply border-border transition-colors duration-300;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  button, .btn {
+    border-radius: var(--radius-md) !important;
+  }
+
+  .rounded-lg, .rounded-xl, .rounded-2xl {
+    border-radius: var(--radius-lg) !important;
+  }
+}
+
+/* Custom Webkit scrollbar for premium lists */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(109, 40, 217, 0.4);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* =========================================
+   GLASSMORPHISM & MESH GLOW OVERLAYS
+   ========================================= */
+.glass-panel {
+  background: rgba(17, 17, 27, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+.glass-panel-elevated {
+  background: rgba(24, 24, 37, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.5);
+}
+
+.glow-hover {
+  position: relative;
+  transition: var(--transition-premium);
+}
+
+.glow-hover::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, #1e1b4b, #312e81, #6d28d9, #2563eb);
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.glow-hover:hover::after {
+  opacity: 0.2;
+}
+
+.glow-hover:hover {
+  box-shadow: var(--shadow-premium-glow);
+  transform: translateY(-2px);
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+}
+
+.bg-brand-gradient {
+  background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #6D28D9 75%, #2563EB 100%);
+}
+
+.bg-accent-gradient {
+  background: linear-gradient(135deg, #7C3AED 0%, #A855F7 50%, #EC4899 100%);
+}
+
+/* Lenis scroll styles */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis-scrolling iframe {
+  pointer-events: none;
+}
