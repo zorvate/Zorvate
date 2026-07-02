@@ -101,6 +101,8 @@ export function ParticlesBackdrop({
       };
     };
 
+    let animationFrameId: number;
+
     const animate = () => {
       const ctx = contextRef.current;
       if (!ctx) return;
@@ -112,24 +114,6 @@ export function ParticlesBackdrop({
         if (circle.alpha < circle.targetAlpha) {
           circle.alpha += 0.005;
         }
-
-        // Draw connections
-        circlesRef.current.forEach((other) => {
-          if (circle === other) return;
-          const dist = Math.hypot(
-            circle.x + circle.translateX - (other.x + other.translateX),
-            circle.y + circle.translateY - (other.y + other.translateY)
-          );
-          if (dist < 100) {
-            const alpha = (1 - dist / 100) * 0.05 * Math.min(circle.alpha, other.alpha);
-            ctx.beginPath();
-            ctx.moveTo(circle.x + circle.translateX, circle.y + circle.translateY);
-            ctx.lineTo(other.x + other.translateX, other.y + other.translateY);
-            ctx.strokeStyle = `rgba(168, 85, 247, ${alpha})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        });
 
         // Mouse effect (push/pull relative to center coordinates)
         if (!staticity) {
@@ -163,7 +147,7 @@ export function ParticlesBackdrop({
         drawCircle(circle);
       });
 
-      requestAnimationFrame(animate);
+      animationFrameId = requestAnimationFrame(animate);
     };
 
     handleResize();
@@ -172,6 +156,7 @@ export function ParticlesBackdrop({
     animate();
 
     return () => {
+      cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
     };
