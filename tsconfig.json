@@ -41,5 +41,6 @@
     "check-regions.ts",
     "test-pg.ts",
     "check-openapi.ts"
+ "scripts/debug"
   ]
 }
