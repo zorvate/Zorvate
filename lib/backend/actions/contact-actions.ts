@@ -29,9 +29,11 @@ export async function submitContactInquiryAction(input: ContactRequestInputType)
 
     const supabase = await createClient();
     // 2. Insert inquiry (anonymous insertion allowed via anon policies)
-    const { data: inquiry, error: insertError } = await supabase
+    const inquiryId = crypto.randomUUID();
+    const { error: insertError } = await supabase
       .from("contact_requests")
       .insert({
+        id: inquiryId,
         name: parsed.name,
         email: parsed.email,
         company: parsed.company || null,
@@ -41,52 +43,80 @@ export async function submitContactInquiryAction(input: ContactRequestInputType)
         file_path: parsed.file_path || null,
         status: parsed.status,
         priority: parsed.priority,
-      })
-      .select()
-      .single();
+      });
     if (insertError) throw insertError;
 
-    // 3. Notify Admins in Database
-    // Fetch all admins using service role to bypass select restrictions
-    const { data: admins } = await supabaseAdmin
-      .from("profiles")
-      .select("id")
-      .in("role", ["admin", "super-admin"]);
+    const inquiry = {
+      id: inquiryId,
+      name: parsed.name,
+      email: parsed.email,
+      company: parsed.company || null,
+      project_type: parsed.project_type || null,
+      budget: parsed.budget || null,
+      message: parsed.message,
+      file_path: parsed.file_path || null,
+      status: parsed.status,
+      priority: parsed.priority,
+      created_at: new Date().toISOString(),
+    };
 
-    if (admins && admins.length > 0) {
-      const notificationsPayload = admins.map(admin => ({
-        user_id: admin.id,
-        title: "New CRM Inquiry",
-        content: `${parsed.name} (${parsed.company || "No Company"}) requested a quote for ${parsed.project_type || "software"}.`,
-        link: "/admin/contact",
-      }));
-      await supabaseAdmin.from("notifications").insert(notificationsPayload);
+    // 3. Notify Admins in Database
+    // Fetch all admins using service role to bypass select restrictions (try-catch protected)
+    try {
+      const { data: admins } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .in("role", ["admin", "super-admin"]);
+
+      if (admins && admins.length > 0) {
+        const notificationsPayload = admins.map(admin => ({
+          user_id: admin.id,
+          title: "New CRM Inquiry",
+          content: `${parsed.name} (${parsed.company || "No Company"}) requested a quote for ${parsed.project_type || "software"}.`,
+          link: "/admin/contact",
+        }));
+        await supabaseAdmin.from("notifications").insert(notificationsPayload);
+      }
+    } catch (e) {
+      console.warn("Failed to dispatch admin notification in DB via service role client:", e);
     }
 
     // 4. Send Confirmation Email to Client
-    await sendConfirmationEmail(parsed.email, parsed.name);
+    try {
+      await sendConfirmationEmail(parsed.email, parsed.name);
+    } catch (e) {
+      console.warn("Failed to send client confirmation email:", e);
+    }
 
     // 5. Send Admin Inquiry Notification Email (simulate alerting admin inbox)
-    await sendAdminInquiryNotification("admin@zorvate.com", {
-      name: parsed.name,
-      email: parsed.email,
-      company: parsed.company || undefined,
-      message: parsed.message,
-      budget: parsed.budget || undefined,
-      project_type: parsed.project_type || undefined,
-    });
+    try {
+      await sendAdminInquiryNotification("admin@zorvate.com", {
+        name: parsed.name,
+        email: parsed.email,
+        company: parsed.company || undefined,
+        message: parsed.message,
+        budget: parsed.budget || undefined,
+        project_type: parsed.project_type || undefined,
+      });
+    } catch (e) {
+      console.warn("Failed to send admin notification email:", e);
+    }
 
     // 6. Record Audit Log (anonymous submitter -> user_id is null)
-    const { ip, userAgent } = await getClientIpAndUserAgent();
-    await AuditRepository.createSystemLog({
-      user_id: null,
-      action: "contact.inquiry.submit",
-      entity_type: "contact_request",
-      entity_id: inquiry.id,
-      details: { name: parsed.name, email: parsed.email, company: parsed.company },
-      ip_address: ip,
-      user_agent: userAgent,
-    });
+    try {
+      const { ip, userAgent } = await getClientIpAndUserAgent();
+      await AuditRepository.createSystemLog({
+        user_id: null,
+        action: "contact.inquiry.submit",
+        entity_type: "contact_request",
+        entity_id: inquiry.id,
+        details: { name: parsed.name, email: parsed.email, company: parsed.company },
+        ip_address: ip,
+        user_agent: userAgent,
+      });
+    } catch (e) {
+      console.warn("Failed to log contact form submission in system audit trail:", e);
+    }
 
     revalidatePath("/admin/contact");
     return inquiry;

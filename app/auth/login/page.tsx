@@ -49,7 +49,23 @@ export default function LoginPage() {
     });
 
     if (!error) {
-      router.push("/portal");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+        const role = profile?.role || "client";
+        const normalizedRole = role.toLowerCase().replace(/_/g, "-");
+        if (normalizedRole === "admin" || normalizedRole === "super-admin") {
+          router.push("/admin");
+        } else {
+          router.push("/portal");
+        }
+      } else {
+        router.push("/portal");
+      }
       router.refresh();
     } else {
       setErrorMsg(error.message);

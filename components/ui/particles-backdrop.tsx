@@ -40,6 +40,8 @@ export function ParticlesBackdrop({
     if (!context) return;
     contextRef.current = context;
 
+    let cachedRect = canvas.getBoundingClientRect();
+
     const handleResize = () => {
       if (!canvas) return;
       const { width, height } = canvas.parentElement?.getBoundingClientRect() || {
@@ -56,6 +58,13 @@ export function ParticlesBackdrop({
       canvasSizeRef.current = { w: width, h: height };
       context.scale(dpr, dpr);
       initCircles();
+      cachedRect = canvas.getBoundingClientRect();
+    };
+
+    const handleScroll = () => {
+      if (canvas) {
+        cachedRect = canvas.getBoundingClientRect();
+      }
     };
 
     const initCircles = () => {
@@ -94,10 +103,9 @@ export function ParticlesBackdrop({
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
       mouseRef.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: e.clientX - cachedRect.left,
+        y: e.clientY - cachedRect.top,
       };
     };
 
@@ -152,12 +160,14 @@ export function ParticlesBackdrop({
 
     handleResize();
     window.addEventListener("resize", handleResize);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("mousemove", handleMouseMove);
     animate();
 
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("mousemove", handleMouseMove);
     };
   }, [quantity, staticity, ease]);

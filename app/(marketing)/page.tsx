@@ -114,10 +114,10 @@ export default function HomePage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0, scale: 0.85, filter: "blur(8px)" }}
                 transition={{ duration: 0.25 }}
-                className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none"
+                className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
               >
-                <div className="relative flex flex-col items-center justify-center">
-                  <svg viewBox="0 0 100 100" className="w-20 h-20 drop-shadow-[0_0_15px_rgba(109,40,217,0.4)]">
+                <div className="relative flex flex-col items-center justify-center animate-pulse">
+                  <svg viewBox="0 0 100 100" className="w-28 h-28 drop-shadow-[0_0_20px_rgba(109,40,217,0.5)]">
                     {/* Top segment */}
                     <motion.path
                       d="M 25,25 L 75,25"
@@ -154,9 +154,9 @@ export default function HomePage() {
                   </svg>
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: [0, 0.5, 0.2] }}
+                    animate={{ opacity: [0, 0.6, 0.2] }}
                     transition={{ duration: 0.5, delay: 0.8 }}
-                    className="absolute w-24 h-24 rounded-full bg-primary/20 blur-[24px]"
+                    className="absolute w-36 h-36 rounded-full bg-primary/20 blur-[28px]"
                   />
                 </div>
               </motion.div>

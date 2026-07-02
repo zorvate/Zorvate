@@ -154,7 +154,7 @@ export default function PricingPage() {
                         <span className="text-2xl font-black tracking-tight uppercase">Custom Quote</span>
                       ) : (
                         <>
-                          <span className="text-sm font-bold mr-0.5">Rs. </span>
+                          <span className="text-sm font-bold mr-0.5">{plan.currency} </span>
                           <span className="text-4xl font-black tracking-tight">{plan.price.toLocaleString()}</span>
                         </>
                       )}

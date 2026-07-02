@@ -41,11 +41,28 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute = path.startsWith("/admin");
   const isPortalRoute = path.startsWith("/portal");
 
+  let userRole = "client";
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    if (profile?.role) {
+      userRole = profile.role.toLowerCase().replace(/_/g, "-");
+    }
+  }
+
   if (!user && (isAdminRoute || isPortalRoute)) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
   if (user && isAuthRoute) {
+    const dest = (userRole === "admin" || userRole === "super-admin") ? "/admin" : "/portal";
+    return NextResponse.redirect(new URL(dest, request.url));
+  }
+
+  if (user && isAdminRoute && userRole !== "admin" && userRole !== "super-admin") {
     return NextResponse.redirect(new URL("/portal", request.url));
   }
 

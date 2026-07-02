@@ -8,7 +8,8 @@ export async function requireAdmin() {
     redirect("/auth/login");
   }
 
-  if (role !== "admin" && role !== "super-admin") {
+  const normalizedRole = role?.toLowerCase().replace(/_/g, "-");
+  if (normalizedRole !== "admin" && normalizedRole !== "super-admin") {
     redirect("/portal");
   }
 

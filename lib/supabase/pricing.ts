@@ -175,7 +175,7 @@ export async function getPricingPlans(supabase: SupabaseClient): Promise<Pricing
       .order("display_order", { ascending: true });
 
     if (plansError) throw plansError;
-    if (!plans || plans.length === 0) return MOCK_PRICING_PLANS;
+    if (!plans) return [];
 
     // Fetch features in parallel or nested
     const { data: features, error: featuresError } = await supabase
@@ -204,7 +204,7 @@ export async function getAllPlansAdmin(supabase: SupabaseClient): Promise<Pricin
       .order("display_order", { ascending: true });
 
     if (plansError) throw plansError;
-    if (!plans || plans.length === 0) return MOCK_PRICING_PLANS;
+    if (!plans) return [];
 
     const { data: features, error: featuresError } = await supabase
       .from("pricing_features")
@@ -273,7 +273,7 @@ export async function getComparisons(supabase: SupabaseClient): Promise<PricingC
       .order("display_order", { ascending: true });
 
     if (error) throw error;
-    if (!data || data.length === 0) return MOCK_PRICING_COMPARISONS;
+    if (!data) return [];
     return data as PricingComparison[];
   } catch (e) {
     console.warn("pricing_comparison table missing, returning mock comparison list:", e);

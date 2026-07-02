@@ -366,7 +366,7 @@ export async function getFaqs(supabase: SupabaseClient): Promise<Faq[]> {
       .select("*")
       .order("display_order", { ascending: true });
     if (error) throw error;
-    return data && data.length > 0 ? data : MOCK_FAQS;
+    return data || [];
   } catch {
     console.warn("faqs table missing or query failed. Using static fallbacks.");
     return MOCK_FAQS;
@@ -380,7 +380,7 @@ export async function getTestimonials(supabase: SupabaseClient): Promise<Testimo
       .select("*")
       .order("display_order", { ascending: true });
     if (error) throw error;
-    return data && data.length > 0 ? data : MOCK_TESTIMONIALS;
+    return data || [];
   } catch {
     console.warn("testimonials table missing or query failed. Using static fallbacks.");
     return MOCK_TESTIMONIALS;
@@ -394,7 +394,7 @@ export async function getTeamMembers(supabase: SupabaseClient): Promise<TeamMemb
       .select("*")
       .order("display_order", { ascending: true });
     if (error) throw error;
-    return data && data.length > 0 ? data : MOCK_TEAM;
+    return data || [];
   } catch {
     console.warn("team_members table missing or query failed. Using static fallbacks.");
     return MOCK_TEAM;
@@ -408,7 +408,7 @@ export async function getServices(supabase: SupabaseClient): Promise<Service[]> 
       .select("*")
       .order("display_order", { ascending: true });
     if (error) throw error;
-    return data && data.length > 0 ? data : MOCK_SERVICES;
+    return data || [];
   } catch {
     console.warn("services table missing or query failed. Using static fallbacks.");
     return MOCK_SERVICES;
@@ -422,7 +422,7 @@ export async function getPortfolioProjects(supabase: SupabaseClient): Promise<Po
       .select("*")
       .order("display_order", { ascending: true });
     if (error) throw error;
-    return data && data.length > 0 ? data : MOCK_PORTFOLIO;
+    return data || [];
   } catch {
     console.warn("portfolio_projects table missing or query failed. Using static fallbacks.");
     return MOCK_PORTFOLIO;
@@ -437,7 +437,7 @@ export async function getJobs(supabase: SupabaseClient): Promise<Job[]> {
       .eq("status", "open")
       .order("display_order", { ascending: true });
     if (error) throw error;
-    return data && data.length > 0 ? data : MOCK_JOBS;
+    return data || [];
   } catch {
     console.warn("jobs table missing or query failed. Using static fallbacks.");
     return MOCK_JOBS;
@@ -451,7 +451,7 @@ export async function getAllJobsAdmin(supabase: SupabaseClient): Promise<Job[]> 
       .select("*")
       .order("display_order", { ascending: true });
     if (error) throw error;
-    return data && data.length > 0 ? data : MOCK_JOBS;
+    return data || [];
   } catch {
     console.warn("jobs table missing or query failed. Using static fallbacks in Admin.");
     return MOCK_JOBS;

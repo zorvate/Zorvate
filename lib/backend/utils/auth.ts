@@ -44,7 +44,11 @@ export async function requireUser(): Promise<AuthenticatedUser> {
 export async function requireRoles(allowedRoles: string[]): Promise<AuthenticatedUser> {
   const user = await requireUser();
   
-  if (!allowedRoles.includes(user.role)) {
+  const normalize = (r: string) => r.toLowerCase().replace(/_/g, "-");
+  const normalizedUserRole = normalize(user.role);
+  const normalizedAllowed = allowedRoles.map(normalize);
+
+  if (!normalizedAllowed.includes(normalizedUserRole)) {
     throw new AppError(`Access denied. Allowed roles: [${allowedRoles.join(", ")}]. Current: [${user.role}]`, "UNAUTHORIZED", 403);
   }
 
