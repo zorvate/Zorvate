@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import CountUp from "react-countup";
-import Tilt from "react-parallax-tilt";
 import { Sparkles, Terminal, Activity, Check } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/browser";
@@ -18,8 +17,6 @@ import { TestimonialsSection } from "@/components/marketing/testimonials-section
 import { StatisticsSection } from "@/components/marketing/statistics-section";
 import { CTASection } from "@/components/marketing/cta-section";
 import { SectionWrapper } from "@/components/marketing/section-wrapper";
-import { ParticlesBackdrop } from "@/components/ui/particles-backdrop";
-import { Magnetic } from "@/components/ui/magnetic";
 import { SpotlightGlow } from "@/components/ui/spotlight-glow";
 
 const clientLogos = [
@@ -47,8 +44,6 @@ const renderStatValue = (val: string | undefined) => {
 };
 
 export default function HomePage() {
-  const shouldReduceMotion = useReducedMotion();
-  const [logoDrawActive, setLogoDrawActive] = useState(true);
   const [settings, setSettings] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -58,29 +53,16 @@ export default function HomePage() {
       setSettings(s);
     }
     loadSettings();
-
-    if (shouldReduceMotion) {
-      setLogoDrawActive(false);
-      return;
-    }
-    const timer = setTimeout(() => {
-      setLogoDrawActive(false);
-    }, 950);
-    return () => clearTimeout(timer);
-  }, [shouldReduceMotion]);
-
-  // Reduced motion overrides
-  const delayBase = shouldReduceMotion ? 0 : 1.0;
-  const staggerDuration = shouldReduceMotion ? 0.3 : 0.8;
+  }, []);
 
   const itemVariants = (delayOffset: number) => ({
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 25 },
+    hidden: { opacity: 0, y: 18 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        delay: delayBase + delayOffset,
-        duration: staggerDuration,
+        delay: 0.08 + delayOffset,
+        duration: 0.45,
         ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
       },
     },
@@ -95,73 +77,7 @@ export default function HomePage() {
         className="relative min-h-screen flex flex-col items-center justify-center pt-24"
       >
         <SectionWrapper className="relative flex flex-col items-center text-center py-12 overflow-hidden w-full">
-          {/* Particles & Lighting backdrop (Renders instantly at 0.0s) */}
-          <ParticlesBackdrop quantity={120} />
-          
-          {/* Floating glowing light orbs */}
-          <div className="absolute top-24 left-[8%] w-[450px] h-[450px] rounded-full bg-gradient-to-br from-violet-600/10 to-indigo-600/5 blur-[130px] animate-float pointer-events-none z-0" />
-          <div className="absolute bottom-16 right-[8%] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-cyan-600/10 to-blue-600/5 blur-[140px] animate-float-delayed pointer-events-none z-0" />
-
-          {/* Decorative Grid Overlay */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_80%,transparent_100%)] pointer-events-none z-10" />
-
-          {/* CENTRAL LOGO DRAWING LAYER (0.2s - 0.8s) */}
-          <AnimatePresence>
-            {logoDrawActive && (
-              <motion.div
-                key="logo-drawing-overlay"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, scale: 0.85, filter: "blur(8px)" }}
-                transition={{ duration: 0.25 }}
-                className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
-              >
-                <div className="relative flex flex-col items-center justify-center animate-pulse">
-                  <svg viewBox="0 0 100 100" className="w-28 h-28 drop-shadow-[0_0_20px_rgba(109,40,217,0.5)]">
-                    {/* Top segment */}
-                    <motion.path
-                      d="M 25,25 L 75,25"
-                      stroke="rgba(167, 139, 250, 0.85)"
-                      strokeWidth="3.5"
-                      fill="none"
-                      strokeLinecap="round"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 0.2, delay: 0.2 }}
-                    />
-                    {/* Diagonal segment */}
-                    <motion.path
-                      d="M 75,25 L 25,75"
-                      stroke="rgba(99, 102, 241, 0.85)"
-                      strokeWidth="3.5"
-                      fill="none"
-                      strokeLinecap="round"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 0.3, delay: 0.4 }}
-                    />
-                    {/* Bottom segment */}
-                    <motion.path
-                      d="M 25,75 L 75,75"
-                      stroke="rgba(167, 139, 250, 0.85)"
-                      strokeWidth="3.5"
-                      fill="none"
-                      strokeLinecap="round"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 0.2, delay: 0.7 }}
-                    />
-                  </svg>
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: [0, 0.6, 0.2] }}
-                    transition={{ duration: 0.5, delay: 0.8 }}
-                    className="absolute w-36 h-36 rounded-full bg-primary/20 blur-[28px]"
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className="absolute inset-0 pointer-events-none" />
 
           {/* MAIN HERO CONTENT STAGGERED REVEALS */}
           <div className="relative z-20 flex flex-col items-center max-w-6xl mx-auto px-4 mt-6">
@@ -172,8 +88,8 @@ export default function HomePage() {
               animate="visible"
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-md text-[10px] font-black uppercase tracking-widest text-primary mb-8 select-none shadow-sm"
             >
-              <Sparkles size={11} className="animate-spin" />
-              <span>Next-Gen Engineering Studio</span>
+              <Sparkles size={11} />
+              <span>Premium Engineering Studio</span>
             </motion.div>
 
             {/* Headline (1.1s) */}
@@ -183,9 +99,9 @@ export default function HomePage() {
               animate="visible"
               className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight leading-[1.05] text-foreground select-none"
             >
-              We Engineer <br />
+              Engineering for <br />
               <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-blue-400 bg-clip-text text-transparent drop-shadow-md py-2">
-                Digital Landmarks
+                Ambitious Products
               </span>
             </motion.h1>
 
@@ -196,7 +112,7 @@ export default function HomePage() {
               animate="visible"
               className="mt-8 max-w-2xl text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed font-medium"
             >
-              Zorvate builds high-end SaaS applications, design systems, and portal dashboards for companies targeting outstanding visual excellence and core speed parameters.
+              We architect premium web platforms, internal tools, and design systems for teams that need precision, reliability, and long-term scalability.
             </motion.p>
 
             {/* CTA Buttons (1.3s) */}
@@ -206,43 +122,29 @@ export default function HomePage() {
               animate="visible"
               className="mt-10 flex flex-col sm:flex-row gap-4 relative z-30"
             >
-              <Magnetic>
-                <Link
-                  href="/auth/register"
-                  className="rounded-xl bg-primary px-8 py-4 text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 glow-btn hover:brightness-110 hover:shadow-primary/40 transition-all duration-300 block text-center cursor-pointer"
-                >
-                  Get Started
-                </Link>
-              </Magnetic>
+              <Link
+                href="/auth/register"
+                className="rounded-xl bg-primary px-8 py-4 text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:brightness-110 transition-all duration-300 block text-center cursor-pointer"
+              >
+                Start a Project
+              </Link>
 
-              <Magnetic>
-                <Link
-                  href="/services"
-                  className="rounded-xl border border-border/80 bg-card/40 backdrop-blur-md px-8 py-4 text-sm font-bold hover:bg-muted/80 transition-all duration-300 block text-center cursor-pointer"
-                >
-                  Explore Services
-                </Link>
-              </Magnetic>
+              <Link
+                href="/services"
+                className="rounded-xl border border-border/80 bg-card/40 backdrop-blur-md px-8 py-4 text-sm font-bold hover:bg-muted/80 transition-all duration-300 block text-center cursor-pointer"
+              >
+                Explore Services
+              </Link>
             </motion.div>
 
-            {/* FLOATING 3D PARALLAX DASHBOARD PREVIEW (1.4s) */}
+            {/* PRODUCT PREVIEW */}
             <motion.div
               variants={itemVariants(0.4)}
               initial="hidden"
               animate="visible"
               className="mt-16 w-full max-w-4xl px-2"
             >
-              <Tilt
-                tiltMaxAngleX={4}
-                tiltMaxAngleY={4}
-                perspective={1000}
-                glareEnable={true}
-                glareMaxOpacity={0.15}
-                glarePosition="all"
-                glareBorderRadius="16px"
-                className="w-full"
-              >
-                <div className="relative rounded-2xl border border-white/5 bg-card/25 backdrop-blur-xl overflow-hidden glass-panel shadow-2xl p-6 flex flex-col text-left">
+              <div className="relative rounded-2xl border border-white/5 bg-card/25 backdrop-blur-xl overflow-hidden glass-panel shadow-2xl p-6 flex flex-col text-left">
                   {/* Dashboard Header Bar */}
                   <div className="flex justify-between items-center pb-4 border-b border-white/5 mb-4">
                     <div className="flex gap-1.5">
@@ -315,7 +217,6 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-              </Tilt>
             </motion.div>
 
             {/* HERO STATISTICS METRICS BOARD (1.5s) */}
@@ -361,7 +262,6 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* Client Logos Header (2.0s onwards) */}
             <motion.div
               variants={itemVariants(0.7)}
               initial="hidden"
@@ -369,9 +269,9 @@ export default function HomePage() {
               className="mt-16 w-full"
             >
               <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground mb-6 select-none">
-                Featured Integrations & Workflows
+                Trusted by teams building serious products
               </p>
-              <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 opacity-60 hover:opacity-90 transition-opacity duration-300">
+              <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 opacity-70">
                 {clientLogos.map((logo, lIdx) => (
                   <div key={lIdx} className="flex items-center gap-2 text-sm font-bold text-foreground select-none">
                     <span className="text-primary text-base">{logo.symbol}</span>
