@@ -12,7 +12,7 @@ interface SpotlightGlowProps extends React.HTMLAttributes<HTMLDivElement> {
 export function SpotlightGlow({
   children,
   className,
-  glowColor = "rgba(109, 40, 217, 0.08)",
+  glowColor = "var(--color-amethyst-soft)",
   radius = 600,
   ...props
 }: SpotlightGlowProps) {

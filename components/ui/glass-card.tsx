@@ -23,9 +23,9 @@ export function GlassCard({
 }: GlassCardProps) {
   const panelClass = cn(
     elevation === "high" ? "glass-panel-elevated" : "glass-panel",
-    glowColor === "primary" && "hover:shadow-primary-glow",
-    glowColor === "accent" && "hover:shadow-accent-glow",
-    "relative overflow-hidden group rounded-2xl transition-all duration-300",
+    glowColor === "primary" && "hover:shadow-[var(--shadow-amethyst)]",
+    glowColor === "accent" && "hover:shadow-[var(--shadow-amethyst)]",
+    "relative overflow-hidden group rounded-[var(--radius-card)] transition-[var(--transition-standard)]",
     className
   );
 
