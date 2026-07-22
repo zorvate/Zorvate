@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Layers, AppWindow, Cpu } from "lucide-react";
+import { ArrowUpRight, Layers, AppWindow, Cpu, Workflow, ShieldCheck, ScanLine } from "lucide-react";
 
 import { SectionWrapper } from "@/components/marketing/section-wrapper";
 import { services as staticServices } from "@/lib/constants/services";
@@ -8,72 +8,92 @@ import { ServiceService } from "@/lib/backend/services/service-service";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: `Services | ${siteConfig.name}`,
+  title: `Services Matrix | ${siteConfig.name}`,
   description:
-    "Explore our digital services including SaaS development, UI/UX design, and full-stack engineering.",
+    "Engineering capabilities matrix — custom web applications, design systems, and digital product architecture.",
 };
 
 const serviceIcons = [AppWindow, Layers, Cpu];
 
 export default async function ServicesPage() {
   const dynamicServices = await ServiceService.listServicesPublic();
-  const displayServices = dynamicServices && dynamicServices.length > 0 ? dynamicServices : staticServices;
+  const displayServices =
+    dynamicServices && dynamicServices.length > 0 ? dynamicServices : staticServices;
 
   return (
     <div className="bg-background relative min-h-screen">
-      {/* Decorative Orbs */}
-      <div className="absolute top-12 left-1/4 w-80 h-80 rounded-full bg-primary/5 blur-[90px] pointer-events-none" />
-      <div className="absolute bottom-16 right-1/4 w-96 h-96 rounded-full bg-accent/5 blur-[100px] pointer-events-none" />
+      <section className="border-b border-border pt-32 pb-24">
+        <SectionWrapper className="py-0">
+          <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+            <div className="max-w-3xl space-y-5">
+              <span className="mono-label text-[10px] text-primary">01 / Services Matrix</span>
+              <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">Engineering systems at the level of infrastructure.</h1>
+              <p className="max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">The studio delivers modular digital infrastructure across product, operations, automation, and platform layers. Every engagement is designed as a durable system, not a single feature.</p>
+            </div>
+            <div className="panel-shell p-6">
+              <div className="mb-4 text-[10px] font-mono uppercase tracking-[0.24em] text-primary">Delivery frame</div>
+              <div className="space-y-3 border-t border-border pt-4 text-sm text-muted-foreground">
+                <div className="flex items-center justify-between border-b border-border/70 pb-3"><span>Primary layers</span><span className="text-foreground">Product / Ops / AI</span></div>
+                <div className="flex items-center justify-between border-b border-border/70 pb-3"><span>Implementation</span><span className="text-foreground">Typed, tested, documented</span></div>
+                <div className="flex items-center justify-between"><span>Outcome</span><span className="text-foreground">Continuity</span></div>
+              </div>
+            </div>
+          </div>
+        </SectionWrapper>
+      </section>
 
-      {/* HERO */}
-      <SectionWrapper className="py-20 md:py-28 relative z-10">
-        <div className="mx-auto max-w-4xl text-center">
-          <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-3.5 py-1 rounded-full border border-primary/10 select-none">
-            Capabilities Matrix
-          </span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-foreground mt-6 leading-tight">
-            Our Digital Services
-          </h1>
-          <p className="mt-6 text-muted-foreground text-sm sm:text-base max-w-xl mx-auto leading-relaxed font-medium">
-            We design, assemble, and scale high-performance software modules tailored to match client product specifications.
-          </p>
+      <SectionWrapper className="border-b border-border bg-surface/20">
+        <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-start">
+          <div className="space-y-4 lg:sticky lg:top-24">
+            <span className="mono-label text-[10px] text-primary">02 / Capability Architecture</span>
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">A layered map of what the studio can construct.</h2>
+            <p className="text-sm leading-7 text-muted-foreground">Each system is formed from distinct layers: experience, product logic, orchestration, integration, and operational support.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {displayServices.map((service, sIdx) => {
+              const Icon = serviceIcons[sIdx % serviceIcons.length];
+              const shortDesc = (service as { shortDescription?: string }).shortDescription || (service as unknown as { short_description?: string }).short_description || "";
+              const num = (sIdx + 1).toString().padStart(2, "0");
+
+              return (
+                <Link key={service.slug} href={`/services/${service.slug}`} className="panel-shell flex h-full flex-col justify-between p-6 transition-colors hover:border-border-hover">
+                  <div className="space-y-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex size-10 items-center justify-center rounded-[var(--radius-sm)] border border-border bg-surface-secondary text-primary"><Icon className="size-4" /></div>
+                      <span className="text-[10px] font-mono uppercase tracking-[0.24em] text-muted-foreground">{num}</span>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold tracking-tight text-foreground">{service.title}</h3>
+                      <p className="text-sm leading-6 text-muted-foreground">{shortDesc}</p>
+                    </div>
+                  </div>
+                  <div className="mt-6 flex items-center justify-between border-t border-border/70 pt-4 text-[10px] font-mono uppercase tracking-[0.24em] text-muted-foreground">
+                    <span>Specification</span>
+                    <ArrowUpRight className="size-3.5 text-primary" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </SectionWrapper>
 
-      {/* SERVICES LIST */}
-      <SectionWrapper className="border-t bg-muted/5 py-16 md:py-24 relative z-10">
-        <div className="mx-auto max-w-6xl grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {displayServices.map((service, sIdx) => {
-            const Icon = serviceIcons[sIdx % serviceIcons.length];
-            const shortDesc = (service as { shortDescription?: string }).shortDescription || (service as unknown as { short_description?: string }).short_description || "";
-            return (
-              <Link
-                key={service.slug}
-                href={`/services/${service.slug}`}
-                className="p-6 sm:p-8 border rounded-2xl bg-card/45 backdrop-blur-md glass-panel flex flex-col justify-between hover:border-primary/20 hover:shadow-lg transition-all duration-300 group hover:translate-y-[-4px]"
-              >
-                <div>
-                  <div className="p-3 bg-primary/10 text-primary w-fit rounded-xl mb-6 shadow-sm group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-                    <Icon size={20} />
-                  </div>
-
-                  <h3 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
-                    {service.title}
-                  </h3>
-
-                  <p className="mt-4 text-xs sm:text-sm text-muted-foreground leading-relaxed font-medium">
-                    {shortDesc}
-                  </p>
-                </div>
-
-                <div className="mt-8 pt-4 border-t border-border/40 flex justify-end">
-                  <span className="text-xs font-bold text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
-                    View Details <ArrowRight size={12} />
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
+      <SectionWrapper className="bg-background/70">
+        <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="panel-shell p-8">
+            <div className="mb-6 text-[10px] font-mono uppercase tracking-[0.24em] text-primary">03 / Delivery model</div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {[{ title: "Workflow design", desc: "Operational systems and process logic mapped before build.", icon: Workflow }, { title: "System integrity", desc: "Security, reliability, and future maintainability built in from the start.", icon: ShieldCheck }, { title: "Executive visibility", desc: "Dashboards and reporting designed for decision-making and oversight.", icon: ScanLine }, { title: "Platform readiness", desc: "Infrastructure that scales without forcing a rebuild.", icon: AppWindow }].map((item) => {
+                const Icon = item.icon;
+                return <div key={item.title} className="rounded-[var(--radius-md)] border border-border bg-surface/50 p-4"><div className="flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-border bg-surface-secondary text-primary"><Icon className="size-4" /></div><h3 className="mt-3 text-sm font-semibold tracking-tight text-foreground">{item.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{item.desc}</p></div>;
+              })}
+            </div>
+          </div>
+          <div className="panel-shell p-8">
+            <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-primary">04 / Outcome</div>
+            <h3 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">Product systems that remain legible as they grow.</h3>
+            <p className="mt-4 text-sm leading-7 text-muted-foreground">The result is not only a polished interface, but a dependable operating environment for teams, clients, and future expansion.</p>
+          </div>
         </div>
       </SectionWrapper>
     </div>
