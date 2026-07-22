@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Briefcase, MapPin, Clock, Sparkles } from "lucide-react";
+import { Briefcase, MapPin, Clock, ArrowUpRight } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/browser";
 import { getJobs, Job } from "@/lib/supabase/cms";
@@ -9,9 +9,7 @@ import { submitJobApplicationAction } from "@/lib/backend/actions/careers-action
 import { SectionWrapper } from "@/components/marketing/section-wrapper";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { SpotlightGlow } from "@/components/ui/spotlight-glow";
-import { GlassCard } from "@/components/ui/glass-card";
-import { ParticlesBackdrop } from "@/components/ui/particles-backdrop";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function CareersPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -74,176 +72,77 @@ export default function CareersPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden">
-      {/* HERO */}
-      <SpotlightGlow
-        radius={600}
-        glowColor="rgba(109, 40, 217, 0.08)"
-        className="relative overflow-hidden border-b"
-      >
-        <SectionWrapper className="py-24 md:py-32 relative z-10">
-          <ParticlesBackdrop quantity={60} />
-          
-          <div className="mx-auto max-w-3xl text-center relative z-10">
-            <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 select-none shadow-sm flex items-center gap-1.5 w-fit mx-auto">
-              <Sparkles size={11} className="animate-pulse" />
-              <span>Careers</span>
-            </span>
-            <h1 className="mt-8 text-5xl sm:text-7xl font-black tracking-tight text-foreground leading-none">
-              Join Our Remote Team
-            </h1>
-            <p className="mt-6 text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed font-medium">
-              We are always looking for passionate engineers, designers, and project operations leads who value clean code, modern workflows, and type-safe systems.
-            </p>
+      <section className="border-b border-border pt-32 pb-24">
+        <SectionWrapper className="py-0">
+          <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+            <div className="max-w-3xl space-y-5">
+              <span className="mono-label text-[10px] text-primary">01 / Careers</span>
+              <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">Join the engineering team building durable digital systems.</h1>
+              <p className="max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">We recruit builders who care about structure, precision, and long-term product integrity. Roles span engineering, design, strategy, and delivery operations.</p>
+            </div>
+            <div className="panel-shell p-6">
+              <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-primary">Team profile</div>
+              <div className="mt-4 space-y-3 border-t border-border pt-4 text-sm text-muted-foreground">
+                <div className="flex items-center justify-between border-b border-border/70 pb-3"><span>Focus</span><span className="text-foreground">Remote-first</span></div>
+                <div className="flex items-center justify-between border-b border-border/70 pb-3"><span>Work style</span><span className="text-foreground">High clarity</span></div>
+                <div className="flex items-center justify-between"><span>Selection</span><span className="text-foreground">Craft over hype</span></div>
+              </div>
+            </div>
           </div>
         </SectionWrapper>
-      </SpotlightGlow>
+      </section>
 
-      {/* JOBS GRID */}
-      <SectionWrapper className="border-t bg-muted/10 py-16 md:py-24 relative z-10">
-        <div className="mx-auto max-w-5xl grid md:grid-cols-5 gap-8 items-start">
-          
-          {/* JOBS LISTING (3/5) */}
-          <div className="md:col-span-3 space-y-6">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-xl font-bold tracking-tight text-foreground select-none">Open Positions</h2>
-              {loadingJobs && (
-                <span className="text-xs text-muted-foreground uppercase tracking-widest">Loading jobs...</span>
-              )}
-            </div>
-
-            {jobs.length > 0 ? (
-              jobs.map((job) => (
-                <GlassCard
-                  key={job.id}
-                  tilt={false}
-                  onClick={() => setSelectedJobId(job.id)}
-                  className={`p-6 border bg-card/20 cursor-pointer hover:border-primary/30 hover:bg-card/45 transition-all duration-300 ${
-                    selectedJobId === job.id ? "ring-2 ring-primary border-transparent" : ""
-                  }`}
-                >
-                  <h3 className="text-lg font-bold text-foreground">{job.title}</h3>
-                  <div className="mt-3 flex flex-wrap gap-4 text-xs text-muted-foreground font-medium">
-                    <span className="flex items-center gap-1">
-                      <Briefcase size={14} className="text-primary" /> {job.department}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <MapPin size={14} className="text-primary" /> {job.location}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock size={14} className="text-primary" /> {job.type}
-                    </span>
-                  </div>
-                  <div className="mt-4 text-sm font-bold text-primary">{job.salary}</div>
-                </GlassCard>
-              ))
-            ) : loadingJobs ? (
-              <div className="p-12 text-center text-sm text-muted-foreground font-mono">Loading available roles...</div>
-            ) : (
-              <div className="p-12 text-center text-sm text-muted-foreground italic font-semibold border border-border/40 rounded-xl bg-card/10">
-                No open roles are available at the moment.
-              </div>
-            )}
+      <SectionWrapper className="border-b border-border bg-surface/20">
+        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+          <div className="space-y-4 lg:sticky lg:top-24">
+            <span className="mono-label text-[10px] text-primary">02 / Open positions</span>
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Select a role and begin the intake.</h2>
+            <p className="text-sm leading-7 text-muted-foreground">Each opening is structured around a clear responsibility, mode of collaboration, and expected delivery scope.</p>
           </div>
-
-          {/* APPLICATION FORM (2/5) */}
-          <div className="md:col-span-2">
-            <GlassCard
-              tilt={false}
-              className="p-6 border bg-card/25"
-            >
-              <h2 className="text-lg font-bold tracking-tight mb-6">
-                Apply {selectedJob ? `for ${selectedJob.title}` : "Now"}
-              </h2>
-              {success ? (
-                <div className="text-center py-8 space-y-4">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20 mx-auto">
-                    <Sparkles size={20} className="animate-pulse" />
-                  </div>
+          <div className="space-y-4">
+            {jobs.length > 0 ? jobs.map((job) => (
+              <button key={job.id} type="button" onClick={() => setSelectedJobId(job.id)} className={`w-full rounded-[var(--radius-md)] border p-5 text-left transition-colors ${selectedJobId === job.id ? "border-primary/50 bg-surface-secondary/80" : "border-border bg-surface/50 hover:border-border-hover"}`}>
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <h3 className="text-base font-bold text-foreground">Application Dispatched!</h3>
-                    <p className="text-xs text-muted-foreground mt-2 font-medium leading-relaxed">
-                      Thank you for applying. Our engineering board will review your profile credentials.
-                    </p>
+                    <h3 className="text-base font-semibold tracking-tight text-foreground">{job.title}</h3>
+                    <div className="mt-2 flex flex-wrap gap-3 text-[10px] font-mono uppercase tracking-[0.24em] text-muted-foreground">
+                      <span className="inline-flex items-center gap-1"><Briefcase className="size-3.5" />{job.department}</span>
+                      <span className="inline-flex items-center gap-1"><MapPin className="size-3.5" />{job.location}</span>
+                      <span className="inline-flex items-center gap-1"><Clock className="size-3.5" />{job.type}</span>
+                    </div>
                   </div>
-                  <Button onClick={() => setSuccess(false)} className="w-full mt-4 h-10 text-xs">
-                    Apply Again
-                  </Button>
+                  <span className="text-sm font-semibold text-primary">{job.salary}</span>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-4 font-medium text-xs">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                      Selected Role
-                    </label>
-                    <Input
-                      value={selectedJob ? selectedJob.title : "Select a role on the left"}
-                      readOnly
-                      className="mt-1 bg-muted/40 cursor-default focus:ring-0 focus:border-border"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                      Full Name
-                    </label>
-                    <Input
-                      placeholder="John Doe"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="mt-1 focus:ring-primary/20 focus:border-primary transition-all duration-300"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                      Email Address
-                    </label>
-                    <Input
-                      type="email"
-                      placeholder="john@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="mt-1 focus:ring-primary/20 focus:border-primary transition-all duration-300"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                      Resume URL
-                    </label>
-                    <Input
-                      type="url"
-                      placeholder="https://dropbox.com/s/my-resume.pdf"
-                      value={resumeUrl}
-                      onChange={(e) => setResumeUrl(e.target.value)}
-                      className="mt-1 focus:ring-primary/20 focus:border-primary transition-all duration-300"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                      Cover Letter (Optional)
-                    </label>
-                    <textarea
-                      placeholder="Tell us why you are a great fit..."
-                      value={cover}
-                      onChange={(e) => setCover(e.target.value)}
-                      className="w-full mt-1 rounded-xl border border-border/80 bg-transparent px-3 py-2 text-xs shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:border-primary min-h-[100px] transition-all duration-300"
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full h-11 text-xs font-bold shadow-lg shadow-primary/10 transition-all duration-300"
-                    disabled={!selectedJobId}
-                  >
-                    Submit Application
-                  </Button>
-                </form>
-              )}
-            </GlassCard>
+              </button>
+            )) : loadingJobs ? <div className="rounded-[var(--radius-md)] border border-border bg-surface/50 p-6 text-sm text-muted-foreground">Loading available roles...</div> : <div className="rounded-[var(--radius-md)] border border-border bg-surface/50 p-6 text-sm text-muted-foreground">No open roles are available at the moment.</div>}
           </div>
+        </div>
+      </SectionWrapper>
 
+      <SectionWrapper className="bg-background/70">
+        <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="panel-shell p-6 sm:p-8">
+            <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-primary">03 / Application intake</div>
+            <h3 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">Submit your profile for the selected role.</h3>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">The intake is intentionally direct so the focus remains on relevant experience, craft, and fit.</p>
+            {success ? <div className="mt-6 rounded-[var(--radius-md)] border border-border bg-surface/50 p-5 text-sm leading-7 text-muted-foreground">Application received. We will review your submission and follow up through the provided contact details.</div> : <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              <div className="space-y-2"><label className="text-[10px] font-mono uppercase tracking-[0.24em] text-muted-foreground">Selected role</label><Input value={selectedJob ? selectedJob.title : "Select a role"} readOnly /></div>
+              <div className="grid gap-4 sm:grid-cols-2"><div className="space-y-2"><label className="text-[10px] font-mono uppercase tracking-[0.24em] text-muted-foreground">Full name</label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Alex Mercer" /></div><div className="space-y-2"><label className="text-[10px] font-mono uppercase tracking-[0.24em] text-muted-foreground">Email</label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="alex@studio.com" /></div></div>
+              <div className="space-y-2"><label className="text-[10px] font-mono uppercase tracking-[0.24em] text-muted-foreground">Resume URL</label><Input type="url" value={resumeUrl} onChange={(e) => setResumeUrl(e.target.value)} placeholder="https://..." /></div>
+              <div className="space-y-2"><label className="text-[10px] font-mono uppercase tracking-[0.24em] text-muted-foreground">Cover note</label><Textarea value={cover} onChange={(e) => setCover(e.target.value)} placeholder="A short note on your experience and fit..." /></div>
+              <Button type="submit" className="w-full gap-2" disabled={!selectedJobId}>Submit application <ArrowUpRight className="size-4" /></Button>
+            </form>}
+          </div>
+          <div className="panel-shell p-6 sm:p-8">
+            <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-primary">04 / What we seek</div>
+            <div className="mt-4 space-y-3">
+              {[
+                "Builders with strong systems thinking and calm execution.",
+                "Designers who understand structure, interaction, and clarity.",
+                "Operators who can keep delivery moving without losing rigor."
+              ].map((item) => <div key={item} className="rounded-[var(--radius-md)] border border-border bg-surface/50 p-4 text-sm leading-6 text-muted-foreground">{item}</div>)}
+            </div>
+          </div>
         </div>
       </SectionWrapper>
     </div>
