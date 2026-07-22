@@ -1,14 +1,32 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { portfolioProjects } from "@/lib/constants/portfolio";
 import { PortfolioCard } from "./portfolio-card";
 import { SectionWrapper } from "./section-wrapper";
+import { createClient } from "@/lib/supabase/browser";
+import { getPortfolioProjects } from "@/lib/supabase/cms";
+
+interface PortfolioProjectItem {
+  slug: string;
+  title: string;
+  category: string;
+  description: string;
+  image_url?: string | null;
+  technologies?: string[] | null;
+}
 
 export function PortfolioPreviewSection() {
-  const featured = portfolioProjects.slice(0, 3);
+  const [featured, setFeatured] = useState<PortfolioProjectItem[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    void getPortfolioProjects(supabase)
+      .then((data) => setFeatured(data.filter((project) => project.featured !== false).slice(0, 3)))
+      .catch(() => setFeatured([]));
+  }, []);
 
   return (
     <SectionWrapper className="border-t bg-background relative overflow-hidden">

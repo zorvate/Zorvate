@@ -10,6 +10,7 @@ import { z } from "zod";
 import { Eye, EyeOff, LayoutDashboard, ChevronRight, Activity, Terminal } from "lucide-react";
 
 import { createClient } from "@/lib/auth/supabase-auth";
+import { getEffectiveRole } from "@/lib/auth/role";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -56,18 +57,11 @@ export default function LoginPage() {
           .select("role")
           .eq("id", user.id)
           .single();
-        const role = profile?.role || "client";
-        let normalizedRole = role.toLowerCase().replace(/_/g, "-");
-        const devAdminEmail = process.env.NEXT_PUBLIC_DEV_ADMIN_EMAIL;
-        if (user.email && devAdminEmail && user.email.toLowerCase() === devAdminEmail.toLowerCase()) {
-          normalizedRole = "super-admin";
-        }
-        
-        if (normalizedRole === "admin" || normalizedRole === "super-admin") {
-          router.push("/admin");
-        } else {
-          router.push("/portal");
-        }
+        const role = profile?.role ?? "client";
+        const effectiveRole = getEffectiveRole(role, user.email);
+        const dest = effectiveRole === "admin" || effectiveRole === "super-admin" ? "/admin" : "/portal";
+
+        router.push(dest);
       } else {
         router.push("/portal");
       }

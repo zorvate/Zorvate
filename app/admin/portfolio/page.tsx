@@ -110,15 +110,33 @@ export default function AdminPortfolio() {
     const file = e.target.files?.[0];
     if (!file || !editingProject) return;
 
+    const maxBytes = type === "image" ? 5 * 1024 * 1024 : 25 * 1024 * 1024;
+    const allowedTypes = type === "image"
+      ? ["image/png", "image/jpeg", "image/webp", "image/gif"]
+      : ["video/mp4", "video/webm", "video/quicktime"];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert(`Only ${type === "image" ? "image" : "video"} files of supported types are allowed.`);
+      return;
+    }
+
+    if (file.size > maxBytes) {
+      alert(`File exceeds the ${type === "image" ? "5MB" : "25MB"} limit.`);
+      return;
+    }
+
     setUploading(type);
     try {
       const supabase = createClient();
-      const fileExt = file.name.split(".").pop();
+      const fileExt = file.name.split(".").pop()?.toLowerCase() || (type === "image" ? "png" : "mp4");
       const filePath = `portfolio/${Date.now()}_${type}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from("media")
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
 
       if (uploadError) throw uploadError;
 
@@ -158,26 +176,32 @@ export default function AdminPortfolio() {
       const process_steps = [s1, s2, s3, s4]
         .filter(s => s.title && s.desc);
 
+      const normalizeOptional = (value?: string | null) => {
+        if (typeof value !== "string") return null;
+        const trimmed = value.trim();
+        return trimmed === "" ? null : trimmed;
+      };
+
       const payload = {
-        title: editingProject.title,
-        slug: editingProject.slug,
-        description: editingProject.description || "",
-        category: editingProject.category || "Custom Software",
+        title: editingProject.title.trim(),
+        slug: editingProject.slug.trim(),
+        description: editingProject.description?.trim() || "",
+        category: (editingProject.category || "Custom Software").trim(),
         status: (editingProject.status as "draft" | "published") || "draft",
         featured: !!editingProject.featured,
-        image_url: editingProject.image_url || "",
-        video_url: editingProject.video_url || "",
-        gallery_urls: editingProject.gallery_urls || [],
+        image_url: normalizeOptional(editingProject.image_url),
+        video_url: normalizeOptional(editingProject.video_url),
+        gallery_urls: Array.isArray(editingProject.gallery_urls) ? editingProject.gallery_urls.map((url) => url.trim()).filter(Boolean) : [],
         technologies,
-        challenge: editingProject.challenge || "",
-        solution: editingProject.solution || "",
-        testimonial_quote: editingProject.testimonial_quote || "",
-        testimonial_author: editingProject.testimonial_author || "",
-        testimonial_role: editingProject.testimonial_role || "",
-        client_name: editingProject.client_name || "",
-        project_date: editingProject.project_date || new Date().toISOString().split("T")[0],
-        seo_title: editingProject.seo_title || "",
-        seo_description: editingProject.seo_description || "",
+        challenge: normalizeOptional(editingProject.challenge),
+        solution: normalizeOptional(editingProject.solution),
+        testimonial_quote: normalizeOptional(editingProject.testimonial_quote),
+        testimonial_author: normalizeOptional(editingProject.testimonial_author),
+        testimonial_role: normalizeOptional(editingProject.testimonial_role),
+        client_name: normalizeOptional(editingProject.client_name),
+        project_date: normalizeOptional(editingProject.project_date) || new Date().toISOString().split("T")[0],
+        seo_title: normalizeOptional(editingProject.seo_title),
+        seo_description: normalizeOptional(editingProject.seo_description),
         metrics,
         process_steps,
       };

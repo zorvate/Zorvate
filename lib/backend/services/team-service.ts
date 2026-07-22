@@ -27,6 +27,9 @@ export const TeamService = {
 
     // Input validation
     const parsed = teamMemberSchema.parse(input);
+    if (!parsed.name || !parsed.role) {
+      throw new AppError("Team member data is incomplete", "VALIDATION_ERROR", 400);
+    }
 
     const member = await TeamRepository.create(supabase, parsed);
 

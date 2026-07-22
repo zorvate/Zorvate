@@ -47,6 +47,9 @@ export const PortfolioService = {
 
     // Input validation
     const parsed = portfolioProjectSchema.parse(input);
+    if (!parsed.slug || !parsed.title || !parsed.description) {
+      throw new AppError("Portfolio project data is incomplete", "VALIDATION_ERROR", 400);
+    }
 
     // Verify slug uniqueness
     const existing = await PortfolioRepository.findBySlug(supabase, parsed.slug);

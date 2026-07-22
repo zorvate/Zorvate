@@ -7,10 +7,30 @@ import { z } from "zod";
 
 const navLinksArraySchema = z.array(
   z.object({
-    title: z.string().min(1, "Link title required"),
-    href: z.string().min(1, "Link URL required"),
+    title: z.string().trim().min(1, "Link title required"),
+    href: z.string().trim().min(1, "Link URL required"),
   })
 );
+
+function normalizeLinkPayload(value: string) {
+  const parsed = JSON.parse(value);
+  const normalized = Array.isArray(parsed)
+    ? parsed.map((link) => {
+        if (typeof link !== "object" || link === null) {
+          return { title: "", href: "" };
+        }
+
+        const entry = link as Record<string, unknown>;
+        return {
+          title: typeof entry.title === "string" ? entry.title.trim() : "",
+          href: typeof entry.href === "string" ? entry.href.trim() : "",
+        };
+      })
+    : [];
+
+  navLinksArraySchema.parse(normalized);
+  return JSON.stringify(normalized);
+}
 
 export const SettingsService = {
   async getSettings() {
@@ -30,8 +50,7 @@ export const SettingsService = {
     // Custom validations for JSON-serialized links
     if (key === "navigation_links" || key === "footer_links") {
       try {
-        const parsed = JSON.parse(value);
-        navLinksArraySchema.parse(parsed);
+        value = normalizeLinkPayload(value);
       } catch (err) {
         if (err instanceof z.ZodError) {
           throw new AppError(`Links schema validation error: ${err.errors[0]?.message}`, "VALIDATION_ERROR", 400);

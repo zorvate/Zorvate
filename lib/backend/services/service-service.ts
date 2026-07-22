@@ -26,6 +26,9 @@ export const ServiceService = {
 
     // Input validation
     const parsed = serviceSchema.parse(input);
+    if (!parsed.slug || !parsed.title || !parsed.description) {
+      throw new AppError("Service data is incomplete", "VALIDATION_ERROR", 400);
+    }
 
     // Verify slug uniqueness
     const existing = await ServiceRepository.findBySlug(supabase, parsed.slug);

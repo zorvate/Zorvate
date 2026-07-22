@@ -82,6 +82,7 @@ export async function deleteTestimonialAction(id: string) {
 // Team Member Actions
 export async function saveTeamMemberAction(input: TeamMemberInputType) {
   return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
     const result = await TeamService.createTeamMember(input);
     revalidatePath("/about");
     revalidatePath("/admin/settings");
@@ -91,6 +92,7 @@ export async function saveTeamMemberAction(input: TeamMemberInputType) {
 
 export async function updateTeamMemberAction(id: string, input: Partial<TeamMemberInputType>) {
   return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
     const result = await TeamService.updateTeamMember(id, input);
     revalidatePath("/about");
     revalidatePath("/admin/settings");
@@ -100,6 +102,7 @@ export async function updateTeamMemberAction(id: string, input: Partial<TeamMemb
 
 export async function deleteTeamMemberAction(id: string) {
   return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
     await TeamService.deleteTeamMember(id);
     revalidatePath("/about");
     revalidatePath("/admin/settings");
@@ -110,6 +113,7 @@ export async function deleteTeamMemberAction(id: string) {
 // Service Actions
 export async function saveServiceAction(input: ServiceInputType) {
   return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
     const result = await ServiceService.createService(input);
     revalidatePath("/services");
     revalidatePath(`/services/${result.slug}`);
@@ -120,6 +124,7 @@ export async function saveServiceAction(input: ServiceInputType) {
 
 export async function updateServiceAction(id: string, input: Partial<ServiceInputType>) {
   return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
     const result = await ServiceService.updateService(id, input);
     revalidatePath("/services");
     revalidatePath(`/services/${result.slug}`);
@@ -130,6 +135,7 @@ export async function updateServiceAction(id: string, input: Partial<ServiceInpu
 
 export async function deleteServiceAction(id: string) {
   return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
     await ServiceService.deleteService(id);
     revalidatePath("/services");
     revalidatePath("/admin/settings");
@@ -140,6 +146,7 @@ export async function deleteServiceAction(id: string) {
 // Portfolio Actions
 export async function savePortfolioProjectAction(input: PortfolioProjectInputType) {
   return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
     const result = await PortfolioService.createProject(input);
     revalidatePath("/portfolio");
     revalidatePath(`/portfolio/${result.slug}`);
@@ -150,6 +157,7 @@ export async function savePortfolioProjectAction(input: PortfolioProjectInputTyp
 
 export async function updatePortfolioProjectAction(id: string, input: Partial<PortfolioProjectInputType>) {
   return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
     const result = await PortfolioService.updateProject(id, input);
     revalidatePath("/portfolio");
     revalidatePath(`/portfolio/${result.slug}`);
@@ -160,6 +168,7 @@ export async function updatePortfolioProjectAction(id: string, input: Partial<Po
 
 export async function deletePortfolioProjectAction(id: string) {
   return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
     await PortfolioService.deleteProject(id);
     revalidatePath("/portfolio");
     revalidatePath("/admin/portfolio");
@@ -170,6 +179,7 @@ export async function deletePortfolioProjectAction(id: string) {
 // Settings Actions
 export async function saveSiteSettingAction(key: string, value: string, label: string) {
   return handleAction(async () => {
+    await requireRoles(["admin", "super-admin"]);
     const result = await SettingsService.saveSetting(key, value, label);
     // Revalidate public landing and meta routing paths
     revalidatePath("/");

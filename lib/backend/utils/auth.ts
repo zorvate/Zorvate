@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getEffectiveRole } from "@/lib/auth/role";
 import { AppError } from "./errors";
 
 export interface AuthenticatedUser {
@@ -23,11 +24,7 @@ export async function requireUser(): Promise<AuthenticatedUser> {
     .eq("id", user.id)
     .single();
 
-  const devAdminEmail = process.env.NEXT_PUBLIC_DEV_ADMIN_EMAIL || process.env.DEV_ADMIN_EMAIL;
-  let defaultRole = "client";
-  if (user.email && devAdminEmail && user.email.toLowerCase() === devAdminEmail.toLowerCase()) {
-    defaultRole = "super-admin";
-  }
+  const defaultRole = getEffectiveRole("client", user.email);
 
   if (profileError || !profile) {
     // If user exists in Auth but profiles table fetch failed, default to 'client' role
@@ -41,7 +38,7 @@ export async function requireUser(): Promise<AuthenticatedUser> {
   return {
     id: user.id,
     email: user.email,
-    role: (user.email && devAdminEmail && user.email.toLowerCase() === devAdminEmail.toLowerCase()) ? "super-admin" : (profile.role || "client"),
+    role: getEffectiveRole(profile.role, user.email),
     fullName: profile.full_name,
     avatarUrl: profile.avatar_url,
   };

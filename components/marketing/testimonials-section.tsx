@@ -1,34 +1,24 @@
+import { useEffect, useState } from "react";
 import { Quote, Star } from "lucide-react";
 import { SectionWrapper } from "./section-wrapper";
+import { createClient } from "@/lib/supabase/browser";
+import { getTestimonials } from "@/lib/supabase/cms";
 
-const testimonials = [
-  {
-    name: "Ammar Jaffri",
-    role: "FinTech Founder",
-    text: "The delivery of our client billing system was faster than expected. Antigravity's code architecture is incredibly clean.",
-    rating: 5,
-  },
-  {
-    name: "Sarah Ahmed",
-    role: "SaaS Builder",
-    text: "We completely migrated our workspace toolset to Zorvate. The project dashboards are state-of-the-art and easy to scale.",
-    rating: 5,
-  },
-  {
-    name: "Zainab Malik",
-    role: "Product Director",
-    text: "Performance, type-safety, and UX design are premium. They took complete ownership of our tech stack launch.",
-    rating: 5,
-  },
-  {
-    name: "Usman Raza",
-    role: "E-commerce COO",
-    text: "The real-time workspace portal made tracking milestones extremely easy. Absolute professionals throughout.",
-    rating: 5,
-  },
-];
+interface TestimonialItem {
+  id: string;
+  name: string;
+  role: string;
+  text: string;
+  rating: number;
+}
 
 export function TestimonialsSection() {
+  const [testimonials, setTestimonials] = useState<TestimonialItem[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    void getTestimonials(supabase).then((data) => setTestimonials(data.slice(0, 4))).catch(() => setTestimonials([]));
+  }, []);
   return (
     <SectionWrapper className="border-t bg-background relative overflow-hidden py-24">
       <div className="mx-auto max-w-6xl relative z-10">

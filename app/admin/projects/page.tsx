@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { FolderKanban, CheckCircle2 } from "lucide-react";
-import { createProjectAction, updateProjectAction, listProjectsAction } from "@/lib/backend/actions/project-actions";
+import { FolderKanban, CheckCircle2, Trash2 } from "lucide-react";
+import { createProjectAction, updateProjectAction, deleteProjectAction, listProjectsAction } from "@/lib/backend/actions/project-actions";
 import { listProfilesAction } from "@/lib/backend/actions/profile-actions";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -101,6 +101,17 @@ export default function AdminProjects() {
     }
   };
 
+  const handleDeleteProject = async (projectId: string) => {
+    if (!confirm("Delete this project and its associated records?")) return;
+
+    const res = await deleteProjectAction(projectId);
+    if (!res.success) {
+      alert(`Delete error: ${res.error}`);
+    } else {
+      await fetchData();
+    }
+  };
+
   return (
     <div className="space-y-8 select-none text-foreground">
       <div>
@@ -160,6 +171,15 @@ export default function AdminProjects() {
                           </option>
                         ))}
                       </select>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10"
+                        onClick={() => handleDeleteProject(proj.id)}
+                      >
+                        <Trash2 size={12} />
+                      </Button>
                     </div>
                   </div>
                 );

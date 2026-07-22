@@ -14,8 +14,10 @@ import {
   listServicesAction,
   listTeamMembersAction,
   saveServiceAction,
+  updateServiceAction,
   deleteServiceAction,
   saveTeamMemberAction,
+  updateTeamMemberAction,
   deleteTeamMemberAction
 } from "@/lib/backend/actions/cms-actions";
 import { SiteSetting, Faq, Testimonial, Service, TeamMember } from "@/lib/supabase/cms";
@@ -49,6 +51,20 @@ export default function AdminSettingsPage() {
   const [editingService, setEditingService] = useState<Partial<Service> | null>(null);
   const [editingTeam, setEditingTeam] = useState<Partial<TeamMember> | null>(null);
 
+  const normalizeServiceRecord = (service: Service | Record<string, unknown>): Service => {
+    const record = service as Record<string, unknown>;
+    const shortDescription = typeof record.shortDescription === "string"
+      ? record.shortDescription
+      : typeof record.short_description === "string"
+      ? record.short_description
+      : "";
+
+    return {
+      ...service,
+      shortDescription,
+    } as Service;
+  };
+
   useEffect(() => {
     async function loadData() {
       setLoading(true);
@@ -73,7 +89,7 @@ export default function AdminSettingsPage() {
         }
         if (faqsRes.success) setFaqs(faqsRes.data);
         if (testimonialsRes.success) setTestimonials(testimonialsRes.data);
-        if (servicesRes.success) setServices(servicesRes.data);
+        if (servicesRes.success) setServices(servicesRes.data.map(normalizeServiceRecord));
         if (teamRes.success) setTeamMembers(teamRes.data);
       } catch (e) {
         console.error("Error loading settings:", e);
@@ -96,7 +112,7 @@ export default function AdminSettingsPage() {
 
   const refreshServices = async () => {
     const res = await listServicesAction();
-    if (res.success) setServices(res.data);
+    if (res.success) setServices(res.data.map(normalizeServiceRecord));
   };
 
   const refreshTeam = async () => {
@@ -229,7 +245,6 @@ export default function AdminSettingsPage() {
     if (!editingService) return;
     try {
       const payload = {
-        id: editingService.id,
         slug: editingService.slug || "",
         title: editingService.title || "",
         short_description: editingService.shortDescription || "",
@@ -237,7 +252,9 @@ export default function AdminSettingsPage() {
         features: editingService.features || [],
         display_order: Number(editingService.display_order || 0),
       };
-      const res = await saveServiceAction(payload);
+      const res = editingService.id
+        ? await updateServiceAction(editingService.id, payload)
+        : await saveServiceAction(payload);
       if (!res.success) throw new Error(res.error);
       setEditingService(null);
       await refreshServices();
@@ -263,13 +280,14 @@ export default function AdminSettingsPage() {
     if (!editingTeam) return;
     try {
       const payload = {
-        id: editingTeam.id,
         name: editingTeam.name || "",
         role: editingTeam.role || "",
         image_url: editingTeam.image_url || "",
         display_order: Number(editingTeam.display_order || 0),
       };
-      const res = await saveTeamMemberAction(payload);
+      const res = editingTeam.id
+        ? await updateTeamMemberAction(editingTeam.id, payload)
+        : await saveTeamMemberAction(payload);
       if (!res.success) throw new Error(res.error);
       setEditingTeam(null);
       await refreshTeam();
@@ -736,7 +754,7 @@ export default function AdminSettingsPage() {
                       </div>
                       <div className="flex gap-2 flex-shrink-0">
                         <Button
-                          onClick={() => setEditingService(service)}
+                          onClick={() => setEditingService(normalizeServiceRecord(service))}
                           variant="outline"
                           size="sm"
                           className="h-7 w-7 p-0"

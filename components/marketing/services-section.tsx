@@ -1,42 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Cpu, Palette, Layers, LayoutDashboard, Plug, Zap } from "lucide-react";
 import { SectionWrapper } from "./section-wrapper";
+import { createClient } from "@/lib/supabase/browser";
+import { getServices } from "@/lib/supabase/cms";
 
-const services = [
-  {
-    title: "SaaS Development",
-    desc: "End-to-end SaaS platforms with authentication, dashboards, and scalable architecture.",
-    icon: Cpu,
-  },
-  {
-    title: "UI/UX Design",
-    desc: "Modern, conversion-focused interfaces designed for engagement and retention.",
-    icon: Palette,
-  },
-  {
-    title: "Full-Stack Systems",
-    desc: "Next.js + Supabase production systems built for real-world scale.",
-    icon: Layers,
-  },
-  {
-    title: "Admin Dashboards",
-    desc: "Powerful internal tools for managing users, content, and business operations.",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "API Integrations",
-    desc: "Stripe, email, storage, analytics, and third-party system integrations.",
-    icon: Plug,
-  },
-  {
-    title: "Performance Optimization",
-    desc: "Speed tuning, SEO improvements, and Core Web Vitals optimization.",
-    icon: Zap,
-  },
-];
+const SERVICE_ICONS = [Cpu, Palette, Layers, LayoutDashboard, Plug, Zap];
+
+interface ServiceItem {
+  title: string;
+  shortDescription?: string;
+  description?: string;
+  slug?: string;
+}
 
 interface CardProps {
   title: string;
@@ -105,6 +83,13 @@ function ServiceCard({ title, desc, icon: Icon, idx }: CardProps) {
 }
 
 export function ServicesSection() {
+  const [services, setServices] = useState<ServiceItem[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    void getServices(supabase).then((data) => setServices(data.slice(0, 6))).catch(() => setServices([]));
+  }, []);
+
   return (
     <SectionWrapper id="services" className="border-t relative overflow-hidden py-24 md:py-32 bg-background">
       {/* Background aurora blur */}
@@ -140,15 +125,19 @@ export function ServicesSection() {
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10 max-w-6xl mx-auto">
-        {services.map((service, i) => (
-          <ServiceCard
-            key={i}
-            title={service.title}
-            desc={service.desc}
-            icon={service.icon}
-            idx={i}
-          />
-        ))}
+        {services.map((service, i) => {
+          const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
+          const desc = service.shortDescription || service.description || "Premium delivery tailored to the product scope.";
+          return (
+            <ServiceCard
+              key={service.slug || `${service.title}-${i}`}
+              title={service.title}
+              desc={desc}
+              icon={Icon}
+              idx={i}
+            />
+          );
+        })}
       </div>
     </SectionWrapper>
   );

@@ -1,35 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 import { SectionWrapper } from "@/components/marketing/section-wrapper";
+import { createClient } from "@/lib/supabase/browser";
+import { getFaqs } from "@/lib/supabase/cms";
 
-const faqs = [
-  {
-    question: "What technologies do you use for development?",
-    answer: "We build primarily with Next.js 15, TypeScript (under strict typing guidelines), Tailwind CSS v4, and Supabase for database integration. This ensures your project is secure, modern, and easily maintainable.",
-  },
-  {
-    question: "How long does a typical SaaS project take to complete?",
-    answer: "A standard Version 1 application normally takes between 4 to 8 weeks to build, test, and deploy. Custom workflows or complex integrations might extend this timeline.",
-  },
-  {
-    question: "Can I manage projects and view invoices online?",
-    answer: "Yes. Once you sign up, you get full access to the Client Portal. There, you can chat with the developer team, upload and view files, inspect the milestone timelines, and manage invoices.",
-  },
-  {
-    question: "How is payment structured?",
-    answer: "We typically charge a 50% deposit to initiate the planning/design phase, with the remaining 50% due upon production launch and handoff of the codebase.",
-  },
-  {
-    question: "Do you offer post-launch support?",
-    answer: "Yes, we offer monthly retainer packages to cover server maintenance, security patches, regular backups, and incremental feature updates.",
-  },
-];
+interface FaqItem {
+  question: string;
+  answer: string;
+}
 
 export default function FAQPage() {
+  const [faqs, setFaqs] = useState<FaqItem[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    void getFaqs(supabase).then((data) => setFaqs(data.slice(0, 6))).catch(() => setFaqs([]));
+  }, []);
 
   const toggle = (idx: number) => {
     setOpenIndex(openIndex === idx ? null : idx);
@@ -53,42 +43,48 @@ export default function FAQPage() {
 
       <SectionWrapper className="border-t bg-muted/10 flex-1">
         <div className="mx-auto max-w-3xl space-y-4">
-          {faqs.map((faq, idx) => {
-            const isOpen = openIndex === idx;
-            return (
-              <div
-                key={idx}
-                className="border bg-background rounded-xl overflow-hidden transition-all"
-              >
-                <button
-                  onClick={() => toggle(idx)}
-                  className="w-full flex items-center justify-between p-6 text-left font-semibold hover:bg-muted/30 transition-colors"
+          {faqs.length > 0 ? (
+            faqs.map((faq, idx) => {
+              const isOpen = openIndex === idx;
+              return (
+                <div
+                  key={idx}
+                  className="border bg-background rounded-xl overflow-hidden transition-all"
                 >
-                  <span className="text-foreground tracking-tight">{faq.question}</span>
-                  {isOpen ? (
-                    <Minus size={18} className="text-primary flex-shrink-0" />
-                  ) : (
-                    <Plus size={18} className="text-primary flex-shrink-0" />
-                  )}
-                </button>
+                  <button
+                    onClick={() => toggle(idx)}
+                    className="w-full flex items-center justify-between p-6 text-left font-semibold hover:bg-muted/30 transition-colors"
+                  >
+                    <span className="text-foreground tracking-tight">{faq.question}</span>
+                    {isOpen ? (
+                      <Minus size={18} className="text-primary flex-shrink-0" />
+                    ) : (
+                      <Plus size={18} className="text-primary flex-shrink-0" />
+                    )}
+                  </button>
 
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: "auto" }}
-                      exit={{ height: 0 }}
-                      transition={{ duration: 0.25 }}
-                    >
-                      <div className="px-6 pb-6 text-sm leading-relaxed text-muted-foreground border-t pt-4">
-                        {faq.answer}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: "auto" }}
+                        exit={{ height: 0 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        <div className="px-6 pb-6 text-sm leading-relaxed text-muted-foreground border-t pt-4">
+                          {faq.answer}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })
+          ) : (
+            <div className="rounded-xl border border-dashed border-border/60 bg-background/70 p-8 text-center text-sm text-muted-foreground">
+              FAQ content will appear here once questions are published from the admin CMS.
+            </div>
+          )}
         </div>
       </SectionWrapper>
     </div>

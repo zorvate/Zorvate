@@ -68,6 +68,10 @@ export default function HomePage() {
     },
   });
 
+  const heroTitle = settings.hero_title || "Engineering for Ambitious Products";
+  const heroSubtitle = settings.hero_subtitle || "We architect premium web platforms, internal tools, and design systems for teams that need precision, reliability, and long-term scalability.";
+  const heroCta = settings.hero_cta_text || "Start a Project";
+
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden bg-background">
       {/* HERO SECTION */}
@@ -99,10 +103,7 @@ export default function HomePage() {
               animate="visible"
               className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight leading-[1.05] text-foreground select-none"
             >
-              Engineering for <br />
-              <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-blue-400 bg-clip-text text-transparent drop-shadow-md py-2">
-                Ambitious Products
-              </span>
+              {heroTitle}
             </motion.h1>
 
             {/* Description (1.2s) */}
@@ -112,7 +113,7 @@ export default function HomePage() {
               animate="visible"
               className="mt-8 max-w-2xl text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed font-medium"
             >
-              We architect premium web platforms, internal tools, and design systems for teams that need precision, reliability, and long-term scalability.
+              {heroSubtitle}
             </motion.p>
 
             {/* CTA Buttons (1.3s) */}
@@ -126,7 +127,7 @@ export default function HomePage() {
                 href="/auth/register"
                 className="rounded-xl bg-primary px-8 py-4 text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:brightness-110 transition-all duration-300 block text-center cursor-pointer"
               >
-                Start a Project
+                {heroCta}
               </Link>
 
               <Link

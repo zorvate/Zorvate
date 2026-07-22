@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from "./server-auth";
+import { getEffectiveRole } from "./role";
 
 export async function getUserRole() {
   const supabase = await createServerSupabaseClient();
@@ -15,10 +16,7 @@ export async function getUserRole() {
     .eq("id", user.id)
     .single();
 
-  const devAdminEmail = process.env.NEXT_PUBLIC_DEV_ADMIN_EMAIL || process.env.DEV_ADMIN_EMAIL;
-  const role = (user.email && devAdminEmail && user.email.toLowerCase() === devAdminEmail.toLowerCase())
-    ? "super-admin"
-    : (profile?.role ?? "client");
+  const role = getEffectiveRole(profile?.role, user.email);
 
   return {
     user,

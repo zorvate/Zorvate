@@ -1,35 +1,40 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
+import { getEffectiveRole } from "@/lib/auth/role";
+
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({
     request,
   });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-        setAll(
-          cookiesToSet: {
-            name: string;
-            value: string;
-            options?: Parameters<typeof response.cookies.set>[2];
-          }[]
-        ) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value);
-            response.cookies.set(name, value, options);
-          });
-        },
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return response;
+  }
+
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
       },
-    }
-  );
+
+      setAll(
+        cookiesToSet: {
+          name: string;
+          value: string;
+          options?: Parameters<typeof response.cookies.set>[2];
+        }[]
+      ) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          request.cookies.set(name, value);
+          response.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
 
   const {
     data: { user },
@@ -48,13 +53,8 @@ export async function middleware(request: NextRequest) {
       .select("role")
       .eq("id", user.id)
       .single();
-    if (profile?.role) {
-      userRole = profile.role.toLowerCase().replace(/_/g, "-");
-    }
-    const devAdminEmail = process.env.NEXT_PUBLIC_DEV_ADMIN_EMAIL || process.env.DEV_ADMIN_EMAIL;
-    if (user.email && devAdminEmail && user.email.toLowerCase() === devAdminEmail.toLowerCase()) {
-      userRole = "super-admin";
-    }
+
+    userRole = getEffectiveRole(profile?.role, user.email);
   }
 
   if (!user && (isAdminRoute || isPortalRoute)) {
@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user && isAuthRoute) {
-    const dest = (userRole === "admin" || userRole === "super-admin") ? "/admin" : "/portal";
+    const dest = userRole === "admin" || userRole === "super-admin" ? "/admin" : "/portal";
     return NextResponse.redirect(new URL(dest, request.url));
   }
 
