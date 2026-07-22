@@ -1,11 +1,9 @@
-import { Compass, Eye, ShieldCheck, Zap, Handshake, Sparkles } from "lucide-react";
+import { Compass, Eye, ShieldCheck, Zap, Handshake, ArrowUpRight } from "lucide-react";
 import { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 
 import { SectionWrapper } from "@/components/marketing/section-wrapper";
-import { ParticlesBackdrop } from "@/components/ui/particles-backdrop";
-import { SpotlightGlow } from "@/components/ui/spotlight-glow";
-import { GlassCard } from "@/components/ui/glass-card";
 import { TeamService } from "@/lib/backend/services/team-service";
 import { MOCK_TEAM } from "@/lib/supabase/cms";
 import { siteConfig } from "@/config/site";
@@ -13,7 +11,7 @@ import { siteConfig } from "@/config/site";
 export const metadata: Metadata = {
   title: `About Studio | ${siteConfig.name}`,
   description:
-    "Zorvate is a premium design and frontend studio dedicated to turning ambitious concept roadmaps into responsive websites.",
+    "Zorvate is a digital engineering studio dedicated to building high-performance web systems and applications.",
 };
 
 export default async function AboutPage() {
@@ -22,147 +20,91 @@ export default async function AboutPage() {
 
   return (
     <div className="bg-background relative min-h-screen text-foreground">
-      {/* HERO SECTION */}
-      <SpotlightGlow
-        radius={700}
-        glowColor="rgba(109, 40, 217, 0.08)"
-        className="relative overflow-hidden border-b"
-      >
-        <SectionWrapper className="py-24 md:py-32 relative z-10">
-          <ParticlesBackdrop quantity={60} />
-          
-          {/* Floating background blobs */}
-          <div className="absolute top-12 left-1/4 w-96 h-96 rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
-          <div className="absolute bottom-16 right-1/4 w-[480px] h-[480px] rounded-full bg-accent/5 blur-[130px] pointer-events-none" />
-
-          <div className="mx-auto max-w-4xl text-center relative z-10">
-            <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 select-none shadow-sm flex items-center gap-1.5 w-fit mx-auto">
-              <Sparkles size={11} className="animate-pulse" />
-              <span>About Our Studio</span>
-            </span>
-            <h1 className="text-5xl sm:text-7xl font-black tracking-tight text-foreground mt-8 leading-none">
-              We Craft High-End <br className="hidden sm:inline" />
-              Digital Deliverables
-            </h1>
-            <p className="mt-6 text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
-              Zorvate is a premium design and frontend studio dedicated to turning ambitious concept roadmaps into responsive websites, dashboard interfaces, and robust software architectures.
-            </p>
+      <section className="border-b border-border pt-32 pb-24">
+        <SectionWrapper className="py-0">
+          <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+            <div className="max-w-3xl space-y-5">
+              <span className="mono-label text-[10px] text-primary">01 / Studio Overview</span>
+              <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+                A studio built around systems, not pitches.
+              </h1>
+              <p className="max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
+                Zorvate operates as a digital engineering studio: architecture, product logic, delivery discipline, and client systems are designed as one continuous structure.
+              </p>
+            </div>
+            <div className="panel-shell p-6">
+              <div className="mb-4 text-[10px] font-mono uppercase tracking-[0.24em] text-primary">Studio spec</div>
+              <div className="space-y-3 border-t border-border pt-4 text-sm text-muted-foreground">
+                <div className="flex items-center justify-between border-b border-border/70 pb-3"><span>Operating model</span><span className="text-foreground">Product engineering</span></div>
+                <div className="flex items-center justify-between border-b border-border/70 pb-3"><span>Delivery style</span><span className="text-foreground">System-first</span></div>
+                <div className="flex items-center justify-between"><span>Primary value</span><span className="text-foreground">Longevity</span></div>
+              </div>
+            </div>
           </div>
         </SectionWrapper>
-      </SpotlightGlow>
+      </section>
 
-      {/* MISSION & VISION */}
-      <SectionWrapper className="border-t bg-muted/5 py-16 md:py-24 relative z-10">
-        <div className="mx-auto max-w-5xl grid md:grid-cols-2 gap-8">
-          <GlassCard tiltMaxAngle={3} className="p-8 border bg-card/30 flex flex-col justify-between">
-            <div>
-              <div className="p-3 bg-primary/10 text-primary w-fit rounded-xl mb-6 shadow-sm">
-                <Compass size={20} />
-              </div>
-              <h2 className="text-xl font-bold tracking-tight text-foreground">Our Core Mission</h2>
-              <p className="mt-4 text-xs sm:text-sm text-muted-foreground leading-relaxed font-medium">
-                We empower brands and product teams to translate engineering concepts into production-grade websites. We merge aesthetic excellence with scalable, accessible code structures.
-              </p>
-            </div>
-          </GlassCard>
-
-          <GlassCard tiltMaxAngle={3} className="p-8 border bg-card/30 flex flex-col justify-between">
-            <div>
-              <div className="p-3 bg-primary/10 text-primary w-fit rounded-xl mb-6 shadow-sm">
-                <Eye size={20} />
-              </div>
-              <h2 className="text-xl font-bold tracking-tight text-foreground">Our Studio Vision</h2>
-              <p className="mt-4 text-xs sm:text-sm text-muted-foreground leading-relaxed font-medium">
-                To be the premier engineering partner for ambitious companies worldwide. We strive to set new benchmarks in modern frontend performance, visual polish, and layout responsiveness.
-              </p>
-            </div>
-          </GlassCard>
+      <SectionWrapper className="border-b border-border bg-surface/20">
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="panel-shell p-8">
+            <div className="mb-6 flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.24em] text-primary"><Compass className="size-3.5" /> Mission</div>
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Translate complexity into durable digital infrastructure.</h2>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground">We build secure, modular, and maintainable systems that hold their structure beyond launch: portals, AI workflows, internal tools, automation layers, and product platforms.</p>
+          </div>
+          <div className="panel-shell p-8">
+            <div className="mb-6 flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.24em] text-primary"><Eye className="size-3.5" /> Vision</div>
+            <p className="text-sm leading-7 text-muted-foreground">The studio exists to replace fragmented delivery with an integrated model of design, engineering, and operational clarity. Each system is treated as a long-lived asset.</p>
+          </div>
         </div>
       </SectionWrapper>
 
-      {/* CORE VALUES */}
-      <SectionWrapper className="border-t bg-muted/10 py-16 md:py-24 relative z-10">
-        <div className="mx-auto max-w-5xl space-y-12">
-          <div className="text-center select-none">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">Studio Anchors</h2>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-2 font-medium">
-              The fundamental guidelines that drive our design and programming sprints.
-            </p>
+      <SectionWrapper className="border-b border-border bg-background/70">
+        <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+          <div className="space-y-4">
+            <span className="mono-label text-[10px] text-primary">02 / Operating Principles</span>
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">The standards that govern every engagement.</h2>
           </div>
-
-          <div className="grid sm:grid-cols-3 gap-6">
+          <div className="grid gap-4 md:grid-cols-3">
             {[
-              {
-                title: "Uncompromising Quality",
-                desc: "We write clean, semantic code built with strict type-safety and modern React architectural conventions.",
-                icon: ShieldCheck,
-              },
-              {
-                title: "High Performance",
-                desc: "We target load speeds, optimize bundle sizes, and use GPU-accelerated motion layers for smooth interaction.",
-                icon: Zap,
-              },
-              {
-                title: "Collaborative Synergy",
-                desc: "We integrate directly with design leads, providing transparent sprint coordination and project feedback loops.",
-                icon: Handshake,
-              },
-            ].map((val, vIdx) => {
+              { title: "Uncompromising Precision", desc: "Strict type safety, semantic structure, and architectural review before implementation.", icon: ShieldCheck },
+              { title: "High Performance", desc: "Lean delivery loops, optimized rendering, and production-grade engineering decisions.", icon: Zap },
+              { title: "Client Synergy", desc: "Transparent workflows, controlled sprints, and direct alignment at every milestone.", icon: Handshake },
+            ].map((val) => {
               const Icon = val.icon;
               return (
-                <GlassCard
-                  key={vIdx}
-                  tilt={true}
-                  tiltMaxAngle={4}
-                  className="p-6 border bg-card/25 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="p-2.5 bg-primary/10 text-primary w-fit rounded-xl mb-4">
-                      <Icon size={16} />
-                    </div>
-                    <h3 className="font-bold text-sm sm:text-base text-foreground">{val.title}</h3>
-                    <p className="mt-3 text-xs text-muted-foreground leading-relaxed font-medium">
-                      {val.desc}
-                    </p>
-                  </div>
-                </GlassCard>
+                <div key={val.title} className="panel-shell p-5">
+                  <div className="flex size-9 items-center justify-center rounded-[var(--radius-sm)] border border-border bg-surface-secondary text-primary"><Icon className="size-4" /></div>
+                  <h3 className="mt-4 text-base font-semibold tracking-tight text-foreground">{val.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{val.desc}</p>
+                </div>
               );
             })}
           </div>
         </div>
       </SectionWrapper>
 
-      {/* MEET OUR TEAM SECTION */}
-      <SectionWrapper className="border-t bg-muted/5 py-16 md:py-24 relative z-10">
-        <div className="mx-auto max-w-5xl space-y-12">
-          <div className="text-center select-none">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">Meet Our Team</h2>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-2 font-medium">
-              The creative minds and technical builders behind our agency deliverables.
-            </p>
+      <SectionWrapper className="bg-surface/20">
+        <div className="rounded-[var(--radius-card)] border border-border bg-background/80 p-6 sm:p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <span className="mono-label text-[10px] text-primary">03 / Engineering Team</span>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Lead architects and systems designers.</h2>
+            </div>
+            <Link href="/careers" className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.24em] text-primary transition-colors hover:text-foreground">
+              Join the team <ArrowUpRight className="size-3.5" />
+            </Link>
           </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
+          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {team.map((member) => (
-              <GlassCard
-                key={member.id}
-                tilt={true}
-                tiltMaxAngle={4}
-                className="p-6 border bg-card/25 flex flex-col items-center text-center group hover:border-primary/20 transition-all duration-300"
-              >
-                <div className="relative w-24 h-24 rounded-full overflow-hidden mb-6 border-2 border-primary/20 group-hover:border-primary/50 transition-all duration-300 shadow-md">
-                  <Image
-                    src={member.image_url}
-                    alt={`${member.name} - ${member.role}`}
-                    width={96}
-                    height={96}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    unoptimized
-                  />
+              <div key={member.id} className="panel-shell p-5">
+                <div className="relative h-40 overflow-hidden rounded-[var(--radius-sm)] border border-border bg-surface-secondary">
+                  <Image src={member.image_url} alt={`${member.name} - ${member.role}`} fill className="object-cover" unoptimized />
                 </div>
-                <h3 className="font-bold text-base text-foreground tracking-tight">{member.name}</h3>
-                <p className="text-xs font-semibold text-primary mt-1">{member.role}</p>
-              </GlassCard>
+                <div className="mt-4 space-y-1">
+                  <h3 className="text-base font-semibold tracking-tight text-foreground">{member.name}</h3>
+                  <p className="text-[10px] font-mono uppercase tracking-[0.24em] text-primary">{member.role}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
