@@ -20,7 +20,9 @@ const parsed = serverEnvSchema.safeParse({
 });
 
 if (!parsed.success) {
-  console.warn("⚠️ Invalid server environment variables:", parsed.error.format());
+  if (process.env.NODE_ENV !== "production") {
+    console.warn("⚠️ Invalid server environment variables:", parsed.error.format());
+  }
 }
 
 export const env = parsed.success

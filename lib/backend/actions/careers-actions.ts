@@ -2,48 +2,48 @@
 
 import { revalidatePath } from "next/cache";
 import { handleAction } from "../utils/errors";
-import { requireRoles, getClientIpAndUserAgent } from "../utils/auth";
-import { createClient } from "@/lib/supabase/server";
-import { AuditRepository } from "../repositories/audit-repository";
+import { CareersService } from "../services/careers-service";
+import { JobApplicationInputType, JobInputType } from "@/lib/validations/cms";
 
 export async function listJobApplicationsAction() {
   return handleAction(async () => {
-    await requireRoles(["admin", "super-admin"]);
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("job_applications")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return CareersService.listJobApplications();
+  });
+}
+
+export async function submitJobApplicationAction(input: JobApplicationInputType) {
+  return handleAction(async () => {
+    const data = await CareersService.submitJobApplication(input);
+    revalidatePath("/admin/careers");
+    return data;
+  });
+}
+
+export async function listJobsAction() {
+  return handleAction(async () => {
+    return CareersService.listJobsForAdmin();
+  });
+}
+
+export async function saveJobAction(input: JobInputType) {
+  return handleAction(async () => {
+    const result = await CareersService.saveJob(input);
+    revalidatePath("/admin/careers");
+    return result;
+  });
+}
+
+export async function deleteJobAction(id: string) {
+  return handleAction(async () => {
+    await CareersService.deleteJob(id);
+    revalidatePath("/admin/careers");
+    return true;
   });
 }
 
 export async function updateJobApplicationStatusAction(id: string, status: string) {
   return handleAction(async () => {
-    const user = await requireRoles(["admin", "super-admin"]);
-    const supabase = await createClient();
-    
-    const { data, error } = await supabase
-      .from("job_applications")
-      .update({ status })
-      .eq("id", id)
-      .select()
-      .single();
-    if (error) throw error;
-
-    // Audit log
-    const { ip, userAgent } = await getClientIpAndUserAgent();
-    await AuditRepository.createSystemLog({
-      user_id: user.id,
-      action: "careers.application.update_status",
-      entity_type: "job_application",
-      entity_id: id,
-      details: { name: data.name, status },
-      ip_address: ip,
-      user_agent: userAgent,
-    });
-
+    const data = await CareersService.updateJobApplicationStatus(id, status);
     revalidatePath("/admin/careers");
     return data;
   });

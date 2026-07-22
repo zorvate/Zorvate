@@ -18,7 +18,7 @@ const parsed = clientEnvSchema.safeParse({
       : "development",
 });
 
-if (!parsed.success) {
+if (!parsed.success && process.env.NODE_ENV !== "production") {
   console.warn("⚠️ Invalid client environment variables:", parsed.error.format());
 }
 

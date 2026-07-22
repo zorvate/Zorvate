@@ -65,8 +65,24 @@ export interface Job {
   location: string;
   type: string;
   salary: string;
-  display_order: number;
+  description: string;
+  requirements?: string[] | null;
+  benefits?: string[] | null;
   status: 'open' | 'closed';
+  created_at?: string;
+  display_order?: number;
+}
+
+export interface JobApplication {
+  id: string;
+  job_id: string;
+  name: string;
+  email: string;
+  resume_path: string;
+  cover_letter?: string | null;
+  status: string;
+  created_at?: string;
+  jobs?: { id: string; title: string };
 }
 
 export interface SiteSetting {
@@ -302,6 +318,9 @@ export const MOCK_JOBS: Job[] = [
     location: "Remote (Global)",
     type: "Full-time",
     salary: "PKR 350k - 500k / month",
+    description: "Lead product development for high-performance web applications in a remote-first engineering team.",
+    requirements: ["5+ years experience building SaaS products", "Strong React, TypeScript and backend knowledge"],
+    benefits: ["Flexible remote schedule", "Professional growth budget"],
     display_order: 0,
     status: "open"
   },
@@ -312,6 +331,9 @@ export const MOCK_JOBS: Job[] = [
     location: "Remote (Global)",
     type: "Full-time",
     salary: "PKR 250k - 350k / month",
+    description: "Design interfaces, user journeys, and product experiences for our client-facing SaaS platforms.",
+    requirements: ["3+ years experience in product design", "Strong prototyping and visual storytelling skills"],
+    benefits: ["Remote collaboration", "Design tooling allowance"],
     display_order: 1,
     status: "open"
   },
@@ -322,6 +344,9 @@ export const MOCK_JOBS: Job[] = [
     location: "Remote",
     type: "Part-time",
     salary: "PKR 150k - 200k / month",
+    description: "Coordinate client deliveries, sprint planning, and cross-functional team execution for product engagements.",
+    requirements: ["Experience running remote project operations", "Excellent stakeholder communication"],
+    benefits: ["Flexible hours", "Remote-friendly culture"],
     display_order: 2,
     status: "open"
   }
@@ -437,7 +462,7 @@ export async function getJobs(supabase: SupabaseClient): Promise<Job[]> {
       .from("jobs")
       .select("*")
       .eq("status", "open")
-      .order("display_order", { ascending: true });
+      .order("created_at", { ascending: false });
     if (error) throw error;
     return data || [];
   } catch {
@@ -451,7 +476,7 @@ export async function getAllJobsAdmin(supabase: SupabaseClient): Promise<Job[]> 
     const { data, error } = await supabase
       .from("jobs")
       .select("*")
-      .order("display_order", { ascending: true });
+      .order("created_at", { ascending: false });
     if (error) throw error;
     return data || [];
   } catch {

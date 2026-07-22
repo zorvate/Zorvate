@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Briefcase, MapPin, Clock, Sparkles } from "lucide-react";
 
+import { createClient } from "@/lib/supabase/browser";
+import { getJobs, Job } from "@/lib/supabase/cms";
+import { submitJobApplicationAction } from "@/lib/backend/actions/careers-actions";
 import { SectionWrapper } from "@/components/marketing/section-wrapper";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,45 +13,63 @@ import { SpotlightGlow } from "@/components/ui/spotlight-glow";
 import { GlassCard } from "@/components/ui/glass-card";
 import { ParticlesBackdrop } from "@/components/ui/particles-backdrop";
 
-const initialJobs = [
-  {
-    title: "Senior Full-Stack Engineer",
-    department: "Engineering",
-    location: "Remote (Global)",
-    type: "Full-time",
-    salary: "$120k - $150k",
-  },
-  {
-    title: "UI/UX Product Designer",
-    department: "Design",
-    location: "Remote (Global)",
-    type: "Full-time",
-    salary: "$90k - $110k",
-  },
-  {
-    title: "Project Operations Manager",
-    department: "Management",
-    location: "Remote",
-    type: "Part-time",
-    salary: "$40/hr - $60/hr",
-  },
-];
-
 export default function CareersPage() {
-  const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [resumeUrl, setResumeUrl] = useState("");
   const [cover, setCover] = useState("");
   const [success, setSuccess] = useState(false);
+  const [loadingJobs, setLoadingJobs] = useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const selectedJob = jobs.find((job) => job.id === selectedJobId) || null;
+
+  useEffect(() => {
+    async function loadJobs() {
+      setLoadingJobs(true);
+      try {
+        const supabase = createClient();
+        const loadedJobs = await getJobs(supabase);
+        setJobs(loadedJobs);
+        if (loadedJobs.length > 0) {
+          setSelectedJobId((prev) => prev || loadedJobs[0].id);
+        }
+      } catch (error) {
+        console.error("Failed to load careers jobs:", error);
+      } finally {
+        setLoadingJobs(false);
+      }
+    }
+
+    loadJobs();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !resumeUrl) {
-      alert("Please fill in name, email and resume link.");
+
+    if (!selectedJobId || !name || !email || !resumeUrl) {
+      alert("Please select a role and provide name, email, and resume URL.");
       return;
     }
-    setSuccess(true);
+
+    const res = await submitJobApplicationAction({
+      job_id: selectedJobId,
+      name: name.trim(),
+      email: email.trim(),
+      resume_path: resumeUrl.trim(),
+      cover_letter: cover.trim() || null,
+    });
+
+    if (res.success) {
+      setSuccess(true);
+      setName("");
+      setEmail("");
+      setResumeUrl("");
+      setCover("");
+    } else {
+      alert(res.error);
+    }
   };
 
   return (
@@ -83,33 +104,45 @@ export default function CareersPage() {
           
           {/* JOBS LISTING (3/5) */}
           <div className="md:col-span-3 space-y-6">
-            <h2 className="text-xl font-bold tracking-tight text-foreground select-none">Open Positions</h2>
-            {initialJobs.map((job, idx) => (
-              <GlassCard
-                key={idx}
-                tilt={false}
-                onClick={() => setSelectedJob(job.title)}
-                className={`p-6 border bg-card/20 cursor-pointer hover:border-primary/30 hover:bg-card/45 transition-all duration-300 ${
-                  selectedJob === job.title ? "ring-2 ring-primary border-transparent" : ""
-                }`}
-              >
-                <h3 className="text-lg font-bold text-foreground">{job.title}</h3>
-                <div className="mt-3 flex flex-wrap gap-4 text-xs text-muted-foreground font-medium">
-                  <span className="flex items-center gap-1">
-                    <Briefcase size={14} className="text-primary" /> {job.department}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <MapPin size={14} className="text-primary" /> {job.location}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock size={14} className="text-primary" /> {job.type}
-                  </span>
-                </div>
-                <div className="mt-4 text-sm font-bold text-primary">
-                  {job.salary}
-                </div>
-              </GlassCard>
-            ))}
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-xl font-bold tracking-tight text-foreground select-none">Open Positions</h2>
+              {loadingJobs && (
+                <span className="text-xs text-muted-foreground uppercase tracking-widest">Loading jobs...</span>
+              )}
+            </div>
+
+            {jobs.length > 0 ? (
+              jobs.map((job) => (
+                <GlassCard
+                  key={job.id}
+                  tilt={false}
+                  onClick={() => setSelectedJobId(job.id)}
+                  className={`p-6 border bg-card/20 cursor-pointer hover:border-primary/30 hover:bg-card/45 transition-all duration-300 ${
+                    selectedJobId === job.id ? "ring-2 ring-primary border-transparent" : ""
+                  }`}
+                >
+                  <h3 className="text-lg font-bold text-foreground">{job.title}</h3>
+                  <div className="mt-3 flex flex-wrap gap-4 text-xs text-muted-foreground font-medium">
+                    <span className="flex items-center gap-1">
+                      <Briefcase size={14} className="text-primary" /> {job.department}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <MapPin size={14} className="text-primary" /> {job.location}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock size={14} className="text-primary" /> {job.type}
+                    </span>
+                  </div>
+                  <div className="mt-4 text-sm font-bold text-primary">{job.salary}</div>
+                </GlassCard>
+              ))
+            ) : loadingJobs ? (
+              <div className="p-12 text-center text-sm text-muted-foreground font-mono">Loading available roles...</div>
+            ) : (
+              <div className="p-12 text-center text-sm text-muted-foreground italic font-semibold border border-border/40 rounded-xl bg-card/10">
+                No open roles are available at the moment.
+              </div>
+            )}
           </div>
 
           {/* APPLICATION FORM (2/5) */}
@@ -119,7 +152,7 @@ export default function CareersPage() {
               className="p-6 border bg-card/25"
             >
               <h2 className="text-lg font-bold tracking-tight mb-6">
-                Apply {selectedJob ? `for ${selectedJob}` : "Now"}
+                Apply {selectedJob ? `for ${selectedJob.title}` : "Now"}
               </h2>
               {success ? (
                 <div className="text-center py-8 space-y-4">
@@ -143,7 +176,7 @@ export default function CareersPage() {
                       Selected Role
                     </label>
                     <Input
-                      value={selectedJob || "Select a role on the left"}
+                      value={selectedJob ? selectedJob.title : "Select a role on the left"}
                       readOnly
                       className="mt-1 bg-muted/40 cursor-default focus:ring-0 focus:border-border"
                     />
@@ -202,7 +235,7 @@ export default function CareersPage() {
                   <Button
                     type="submit"
                     className="w-full h-11 text-xs font-bold shadow-lg shadow-primary/10 transition-all duration-300"
-                    disabled={!selectedJob}
+                    disabled={!selectedJobId}
                   >
                     Submit Application
                   </Button>

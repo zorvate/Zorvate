@@ -88,3 +88,28 @@ export const portfolioProjectSchema = z.object({
 });
 
 export type PortfolioProjectInputType = z.infer<typeof portfolioProjectSchema>;
+
+export const jobSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: nonEmptyString.min(3, "Job title must be at least 3 characters").max(200),
+  department: nonEmptyString.min(2, "Department is required").max(100),
+  location: nonEmptyString.min(2, "Location is required").max(100),
+  type: nonEmptyString.min(2, "Job type is required").max(100),
+  salary: nonEmptyString.min(2, "Salary range is required").max(100),
+  description: nonEmptyString.min(10, "Description must be at least 10 characters").max(1000),
+  requirements: z.array(nonEmptyString).default([]),
+  benefits: z.array(nonEmptyString).default([]),
+  status: z.enum(["open", "closed"]).default("open"),
+});
+
+export type JobInputType = z.infer<typeof jobSchema>;
+
+export const jobApplicationSchema = z.object({
+  job_id: z.string().uuid("Invalid job selection"),
+  name: z.string().min(2, "Name must be at least 2 characters").max(100),
+  email: z.string().email("Invalid email address"),
+  resume_path: z.string().url("Invalid resume URL").min(1, "Resume URL is required"),
+  cover_letter: optionalTextField(1000),
+});
+
+export type JobApplicationInputType = z.infer<typeof jobApplicationSchema>;
