@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { Quote, Star } from "lucide-react";
+import { motion } from "framer-motion";
 import { SectionWrapper } from "./section-wrapper";
 import { createClient } from "@/lib/supabase/browser";
 import { getTestimonials } from "@/lib/supabase/cms";
@@ -17,62 +19,33 @@ export function TestimonialsSection() {
 
   useEffect(() => {
     const supabase = createClient();
-    void getTestimonials(supabase).then((data) => setTestimonials(data.slice(0, 4))).catch(() => setTestimonials([]));
+    void getTestimonials(supabase)
+      .then((data) => setTestimonials(data.slice(0, 4)))
+      .catch(() => setTestimonials([]));
   }, []);
+
   return (
-    <SectionWrapper className="border-t bg-background relative overflow-hidden py-24">
-      <div className="mx-auto max-w-6xl relative z-10">
-        <div className="text-center mb-16 max-w-2xl mx-auto">
-          <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full">
-            Client Reviews
-          </span>
-          <h2 className="mt-4 text-3xl md:text-5xl font-extrabold tracking-tight text-foreground">
-            Trusted by Builders
-          </h2>
-          <p className="mt-4 text-muted-foreground text-base leading-relaxed">
-            Read reviews from startup founders and development leaders working with us.
-          </p>
+    <SectionWrapper className="border-b border-border bg-background/70">
+      <div className="rounded-[var(--radius-card)] border border-border bg-surface/50 p-5 sm:p-8">
+        <div className="mb-8 max-w-2xl">
+          <span className="mono-label text-[10px] text-primary">06 / Partner Verification</span>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Evidence from teams operating at high complexity.</h2>
         </div>
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {testimonials.map((t) => (
-            <div
-              key={t.name}
-              className="p-6 rounded-2xl border bg-background/50 backdrop-blur-md glass-panel flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex gap-1">
-                    {Array.from({ length: t.rating }).map((_, rIdx) => (
-                      <Star key={rIdx} size={14} className="fill-primary text-primary" />
-                    ))}
-                  </div>
-                  <Quote size={20} className="text-muted-foreground/40" />
-                </div>
-
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed italic">
-                  &ldquo;{t.text}&rdquo;
-                </p>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-border/40 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                  {t.name.charAt(0)}
-                </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          {testimonials.map((t, idx) => (
+            <motion.div key={t.name} initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.05, duration: 0.35 }} className="panel-shell p-5">
+              <p className="text-sm leading-7 text-muted-foreground">“{t.text}”</p>
+              <div className="mt-6 flex items-center gap-3 border-t border-border/70 pt-4">
+                <div className="flex size-9 items-center justify-center rounded-full border border-border bg-surface-secondary font-mono text-sm font-semibold text-primary">{t.name.charAt(0)}</div>
                 <div>
-                  <h4 className="text-xs font-bold text-foreground">
-                    {t.name}
-                  </h4>
-                  <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
-                    {t.role}
-                  </p>
+                  <div className="text-sm font-semibold text-foreground">{t.name}</div>
+                  <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-muted-foreground">{t.role}</div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
     </SectionWrapper>
   );
 }
-

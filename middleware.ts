@@ -8,6 +8,18 @@ export async function middleware(request: NextRequest) {
     request,
   });
 
+  const path = request.nextUrl.pathname;
+
+  const isAuthRoute = path.startsWith("/auth");
+  const isAdminRoute = path.startsWith("/admin");
+  const isPortalRoute = path.startsWith("/portal");
+  const isProtectedRoute = isAuthRoute || isAdminRoute || isPortalRoute;
+
+  // Immediately return response for public marketing routes to avoid unnecessary Supabase network calls
+  if (!isProtectedRoute) {
+    return response;
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -36,26 +48,27 @@ export async function middleware(request: NextRequest) {
     },
   });
 
+  const startTime = Date.now();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const path = request.nextUrl.pathname;
-
-  const isAuthRoute = path.startsWith("/auth");
-  const isAdminRoute = path.startsWith("/admin");
-  const isPortalRoute = path.startsWith("/portal");
-
   let userRole = "client";
   if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    userRole = getEffectiveRole(profile?.role, user.email);
+    userRole = getEffectiveRole(null, user.email);
+    if (userRole !== "super-admin") {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      userRole = getEffectiveRole(profile?.role, user.email);
+    }
   }
+
+  const duration = Date.now() - startTime;
+  console.log(`[Middleware] Auth check for ${path} (${duration}ms) - Role: ${userRole}`);
 
   if (!user && (isAdminRoute || isPortalRoute)) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
@@ -75,6 +88,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next|favicon.ico|images|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

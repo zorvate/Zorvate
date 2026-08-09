@@ -11,15 +11,22 @@ interface ContactRequest {
 export default async function AdminDashboard() {
   const supabase = await createClient();
 
-  // Query stats
-  const { data: projects } = await supabase.from("projects").select("id, status");
-  const { data: invoices } = await supabase.from("invoices").select("amount");
-  const { data: jobs } = await supabase.from("job_applications").select("id");
-  const { data: contacts } = await supabase
-    .from("contact_requests")
-    .select("id, name, email, created_at")
-    .order("created_at", { ascending: false })
-    .limit(3);
+  // Parallelize independent database queries
+  const [projectsRes, invoicesRes, jobsRes, contactsRes] = await Promise.all([
+    supabase.from("projects").select("id, status"),
+    supabase.from("invoices").select("amount"),
+    supabase.from("job_applications").select("id"),
+    supabase
+      .from("contact_requests")
+      .select("id, name, email, created_at")
+      .order("created_at", { ascending: false })
+      .limit(3),
+  ]);
+
+  const projects = projectsRes.data;
+  const invoices = invoicesRes.data;
+  const jobs = jobsRes.data;
+  const contacts = contactsRes.data;
 
   const totalProjects = projects?.length || 0;
   const activeProjects = projects?.filter((p) => p.status === "active").length || 0;

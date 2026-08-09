@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Cpu, Palette, Layers, LayoutDashboard, Plug, Zap } from "lucide-react";
+import { Cpu, Palette, Layers, LayoutDashboard, Plug, Zap, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { SectionWrapper } from "./section-wrapper";
 import { createClient } from "@/lib/supabase/browser";
 import { getServices } from "@/lib/supabase/cms";
@@ -16,128 +17,66 @@ interface ServiceItem {
   slug?: string;
 }
 
-interface CardProps {
-  title: string;
-  desc: string;
-  icon: React.ComponentType<{ size?: number }>;
-  idx: number;
-}
-
-function ServiceCard({ title, desc, icon: Icon, idx }: CardProps) {
-  const [coords, setCoords] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setCoords({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: idx * 0.05, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -8 }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="p-8 rounded-2xl border bg-card/40 hover:bg-card/75 backdrop-blur-md glass-panel relative overflow-hidden group transition-all duration-300 flex flex-col justify-between min-h-[240px] cursor-default"
-    >
-      {/* Mouse Tracking Spotlight Glow */}
-      <div
-        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"
-        style={{
-          background: `radial-gradient(200px circle at ${coords.x}px ${coords.y}px, rgba(139, 92, 246, 0.12), transparent 80%)`,
-        }}
-      />
-
-      {/* Spotlight Border */}
-      <div
-        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 border border-primary/30"
-        style={{
-          clipPath: isHovered
-            ? `circle(130px at ${coords.x}px ${coords.y}px)`
-            : "circle(0px)",
-        }}
-      />
-
-      <div className="space-y-5 relative z-20">
-        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-          <Icon size={22} />
-        </div>
-        <div>
-          <h3 className="font-bold text-xl text-foreground tracking-tight group-hover:text-primary transition-colors">
-            {title}
-          </h3>
-          <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-            {desc}
-          </p>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 export function ServicesSection() {
   const [services, setServices] = useState<ServiceItem[]>([]);
 
   useEffect(() => {
     const supabase = createClient();
-    void getServices(supabase).then((data) => setServices(data.slice(0, 6))).catch(() => setServices([]));
+    void getServices(supabase)
+      .then((data) => setServices(data.slice(0, 6)))
+      .catch(() => setServices([]));
   }, []);
 
   return (
-    <SectionWrapper id="services" className="border-t relative overflow-hidden py-24 md:py-32 bg-background">
-      {/* Background aurora blur */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[130px] pointer-events-none" />
+    <SectionWrapper id="services" className="border-b border-border bg-surface/20">
+      <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+        <div className="space-y-4 lg:sticky lg:top-24">
+          <span className="mono-label text-[10px] text-primary">01 / Capabilities</span>
+          <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            Digital systems engineered as infrastructure.
+          </h2>
+          <p className="max-w-xl text-sm leading-7 text-muted-foreground">
+            Every engagement is framed as a production system: architecture, performance, operations, and delivery are designed to work together from day one.
+          </p>
+          <Link href="/services" className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.24em] text-primary transition-colors hover:text-foreground">
+            View Full Matrix <ArrowUpRight className="size-3.5" />
+          </Link>
+        </div>
 
-      <div className="text-center mb-16 relative z-10">
-        <motion.span 
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-3.5 py-1 rounded-full border border-primary/10 select-none"
-        >
-          Our Capabilities
-        </motion.span>
-        <motion.h2 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className="text-3xl md:text-5xl font-extrabold tracking-tight mt-4 text-foreground"
-        >
-          What We Build
-        </motion.h2>
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="text-muted-foreground mt-4 max-w-xl mx-auto text-base"
-        >
-          High-performance systems designed for scale, speed, and conversion.
-        </motion.p>
-      </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {services.map((service, i) => {
+            const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
+            const desc = service.shortDescription || service.description || "Bespoke system architecture tailored to product requirements.";
+            const num = (i + 1).toString().padStart(2, "0");
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10 max-w-6xl mx-auto">
-        {services.map((service, i) => {
-          const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
-          const desc = service.shortDescription || service.description || "Premium delivery tailored to the product scope.";
-          return (
-            <ServiceCard
-              key={service.slug || `${service.title}-${i}`}
-              title={service.title}
-              desc={desc}
-              icon={Icon}
-              idx={i}
-            />
-          );
-        })}
+            return (
+              <motion.div
+                key={service.slug || `${service.title}-${i}`}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.06 }}
+                className="panel-shell flex h-full flex-col justify-between p-5"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono uppercase tracking-[0.24em] text-muted-foreground">{num}</span>
+                    <div className="rounded-full border border-border bg-surface-secondary p-2 text-primary">
+                      <Icon className="size-3.5" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-base font-semibold tracking-tight text-foreground">{service.title}</h3>
+                    <p className="text-sm leading-6 text-muted-foreground">{desc}</p>
+                  </div>
+                </div>
+                <Link href={`/services/${service.slug || ""}`} className="mt-6 inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.24em] text-primary transition-colors hover:text-foreground">
+                  Explore <ArrowUpRight className="size-3.5" />
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </SectionWrapper>
   );

@@ -67,10 +67,22 @@ export default function RegisterPage() {
 
   const strength = getPasswordStrength(passwordVal);
 
+  const isAllowedEmail = (emailStr: string) => {
+    const normalized = emailStr.toLowerCase().trim();
+    const devAdmin = (process.env.NEXT_PUBLIC_DEV_ADMIN_EMAIL || "zorvate.space@gmail.com").toLowerCase().trim();
+    return normalized.endsWith("@zorvate.com") || normalized === devAdmin || normalized === "zorvate.space@gmail.com";
+  };
+
   const nextStep = async () => {
+    setErrorMsg(null);
     // Validate Step 1 fields
     const valid = await trigger(["fullName", "email"]);
     if (valid) {
+      const emailValue = watch("email") || "";
+      if (!isAllowedEmail(emailValue)) {
+        setErrorMsg("Registration restricted: Only authorized agency emails (@zorvate.com) or primary admin (zorvate.space@gmail.com) can register.");
+        return;
+      }
       setStep(2);
     }
   };
@@ -82,6 +94,12 @@ export default function RegisterPage() {
   const onSubmit = async (values: RegisterFormValues) => {
     setLoading(true);
     setErrorMsg(null);
+
+    if (!isAllowedEmail(values.email)) {
+      setErrorMsg("Registration restricted: Only authorized agency emails (@zorvate.com) or primary admin (zorvate.space@gmail.com) can register.");
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.auth.signUp({
       email: values.email,

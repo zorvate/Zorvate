@@ -394,9 +394,9 @@ export async function getFaqs(supabase: SupabaseClient): Promise<Faq[]> {
       .order("display_order", { ascending: true });
     if (error) throw error;
     return data || [];
-  } catch {
-    console.warn("faqs table missing or query failed. Using static fallbacks.");
-    return MOCK_FAQS;
+  } catch (error) {
+    console.warn("getFaqs query failed:", error);
+    return [];
   }
 }
 
@@ -408,9 +408,9 @@ export async function getTestimonials(supabase: SupabaseClient): Promise<Testimo
       .order("display_order", { ascending: true });
     if (error) throw error;
     return data || [];
-  } catch {
-    console.warn("testimonials table missing or query failed. Using static fallbacks.");
-    return MOCK_TESTIMONIALS;
+  } catch (error) {
+    console.warn("getTestimonials query failed:", error);
+    return [];
   }
 }
 
@@ -422,9 +422,9 @@ export async function getTeamMembers(supabase: SupabaseClient): Promise<TeamMemb
       .order("display_order", { ascending: true });
     if (error) throw error;
     return data || [];
-  } catch {
-    console.warn("team_members table missing or query failed. Using static fallbacks.");
-    return MOCK_TEAM;
+  } catch (error) {
+    console.warn("getTeamMembers query failed:", error);
+    return [];
   }
 }
 
@@ -436,10 +436,30 @@ export async function getServices(supabase: SupabaseClient): Promise<Service[]> 
       .order("display_order", { ascending: true });
     if (error) throw error;
     return data || [];
-  } catch {
-    console.warn("services table missing or query failed. Using static fallbacks.");
-    return MOCK_SERVICES;
+  } catch (error) {
+    console.warn("getServices query failed:", error);
+    return [];
   }
+}
+
+export function formatSupabaseError(err: unknown) {
+  if (typeof err === "object" && err !== null) {
+    const e = err as Record<string, unknown>;
+    return {
+      message: (e.message as string) || String(err),
+      code: (e.code as string) ?? null,
+      details: (e.details as string) ?? null,
+      hint: (e.hint as string) ?? null,
+      stack: (e.stack as string) || (err instanceof Error ? err.stack : "no-stack"),
+    };
+  }
+  return {
+    message: String(err),
+    code: null,
+    details: null,
+    hint: null,
+    stack: "no-stack",
+  };
 }
 
 export async function getPortfolioProjects(supabase: SupabaseClient): Promise<PortfolioProject[]> {
@@ -450,9 +470,24 @@ export async function getPortfolioProjects(supabase: SupabaseClient): Promise<Po
       .order("display_order", { ascending: true });
     if (error) throw error;
     return data || [];
-  } catch {
-    console.warn("portfolio_projects table missing or query failed. Using static fallbacks.");
-    return MOCK_PORTFOLIO;
+  } catch (err) {
+    const diag = formatSupabaseError(err);
+
+    if (diag.message && /display_order.*does not exist/i.test(diag.message)) {
+      console.warn("portfolio_projects.display_order missing; falling back to created_at ordering until the DB migration is applied.");
+      const { data, error: fallbackError } = await supabase
+        .from("portfolio_projects")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (fallbackError) {
+        console.error("getPortfolioProjects fallback error:", formatSupabaseError(fallbackError));
+        throw fallbackError;
+      }
+      return data || [];
+    }
+
+    console.error("getPortfolioProjects error:", JSON.stringify(diag, null, 2));
+    throw err;
   }
 }
 
@@ -465,9 +500,9 @@ export async function getJobs(supabase: SupabaseClient): Promise<Job[]> {
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data || [];
-  } catch {
-    console.warn("jobs table missing or query failed. Using static fallbacks.");
-    return MOCK_JOBS;
+  } catch (error) {
+    console.warn("getJobs query failed:", error);
+    return [];
   }
 }
 
@@ -479,9 +514,9 @@ export async function getAllJobsAdmin(supabase: SupabaseClient): Promise<Job[]> 
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data || [];
-  } catch {
-    console.warn("jobs table missing or query failed. Using static fallbacks in Admin.");
-    return MOCK_JOBS;
+  } catch (error) {
+    console.warn("getAllJobsAdmin query failed:", error);
+    return [];
   }
 }
 
@@ -491,18 +526,18 @@ export async function getSiteSettings(supabase: SupabaseClient): Promise<Record<
       .from("site_settings")
       .select("*");
     if (error) throw error;
-    
+
     if (data && data.length > 0) {
-      const settingsDict: Record<string, string> = { ...MOCK_SITE_SETTINGS };
+      const settingsDict: Record<string, string> = {};
       data.forEach((row: SiteSetting) => {
         settingsDict[row.key] = row.value;
       });
       return settingsDict;
     }
-    return MOCK_SITE_SETTINGS;
-  } catch {
-    console.warn("site_settings table missing or query failed. Using static fallbacks.");
-    return MOCK_SITE_SETTINGS;
+    return {};
+  } catch (error) {
+    console.warn("getSiteSettings query failed:", error);
+    return {};
   }
 }
 
@@ -515,14 +550,10 @@ export async function getRawSiteSettings(supabase: SupabaseClient): Promise<Site
     if (data && data.length > 0) {
       return data;
     }
-  } catch {
-    console.warn("site_settings table missing.");
+  } catch (error) {
+    console.warn("getRawSiteSettings query failed:", error);
   }
-  return Object.keys(MOCK_SITE_SETTINGS).map(key => ({
-    key,
-    value: MOCK_SITE_SETTINGS[key],
-    label: key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())
-  }));
+  return [];
 }
 
 // ==========================================

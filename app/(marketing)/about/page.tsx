@@ -5,7 +5,6 @@ import Link from "next/link";
 
 import { SectionWrapper } from "@/components/marketing/section-wrapper";
 import { TeamService } from "@/lib/backend/services/team-service";
-import { MOCK_TEAM } from "@/lib/supabase/cms";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
@@ -15,8 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AboutPage() {
-  const dynamicTeam = await TeamService.listTeamMembersPublic();
-  const team = dynamicTeam && dynamicTeam.length > 0 ? dynamicTeam : MOCK_TEAM;
+  const team = await TeamService.listTeamMembersPublic();
 
   return (
     <div className="bg-background relative min-h-screen text-foreground">

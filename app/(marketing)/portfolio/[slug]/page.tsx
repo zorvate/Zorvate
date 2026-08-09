@@ -31,7 +31,6 @@ export default async function PortfolioDetailPage({ params }: Props) {
   const { slug } = await params;
   const project = await PortfolioService.getPublishedProjectBySlug(slug);
 
-
   if (!project || project.status !== "published") {
     notFound();
   }
@@ -52,6 +51,11 @@ export default async function PortfolioDetailPage({ params }: Props) {
     process_steps: project.process_steps,
     client_name: project.client_name,
     project_date: project.project_date ? String(project.project_date) : null,
+    live_url: project.live_url || null,
+    content: project.content || null,
+    image_url: project.image_url || null,
+    video_url: project.video_url || null,
+    gallery_urls: project.gallery_urls || [],
   };
 
   return <PortfolioDetailClient project={projectPayload} />;

@@ -44,6 +44,20 @@ export default function LoginPage() {
     setLoading(true);
     setErrorMsg(null);
 
+    const normalizedEmail = values.email.toLowerCase().trim();
+    const devAdminEmail = (process.env.NEXT_PUBLIC_DEV_ADMIN_EMAIL || "zorvate.space@gmail.com").toLowerCase().trim();
+
+    const isAllowed =
+      normalizedEmail.endsWith("@zorvate.com") ||
+      normalizedEmail === devAdminEmail ||
+      normalizedEmail === "zorvate.space@gmail.com";
+
+    if (!isAllowed) {
+      setErrorMsg("Access restricted: Only authorized agency emails (@zorvate.com) or primary admin (zorvate.space@gmail.com) can access login.");
+      setLoading(false);
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email: values.email,
       password: values.password,

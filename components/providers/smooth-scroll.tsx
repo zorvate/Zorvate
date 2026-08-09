@@ -1,16 +1,27 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
-    // Initialize Lenis smooth scroll
+    // Skip smooth scroll on admin, portal, and auth routes to isolate admin shell
+    if (
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/portal") ||
+      pathname.startsWith("/auth")
+    ) {
+      return;
+    }
+
+    // Initialize Lenis smooth scroll for marketing routes
     const lenis = new Lenis({
       duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeOutExpo
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       wheelMultiplier: 1.0,
       touchMultiplier: 1.5,
       infinite: false,
@@ -48,7 +59,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       lenis.destroy();
       document.removeEventListener("click", handleHashScroll);
     };
-  }, []);
+  }, [pathname]);
 
   return <>{children}</>;
 }

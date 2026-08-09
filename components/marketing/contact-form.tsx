@@ -4,14 +4,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowUpRight } from "lucide-react";
 
 import { submitContactInquiryAction } from "@/lib/backend/actions/contact-actions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { GlassCard } from "@/components/ui/glass-card";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -60,34 +59,28 @@ export function ContactForm() {
   return (
     <div className="w-full">
       {success ? (
-        <GlassCard
-          tilt={false}
-          className="p-8 border bg-card/25 text-center space-y-6"
-        >
-          <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 mx-auto shadow-inner">
-            <CheckCircle2 size={32} className="animate-bounce" />
+        <div className="p-8 border border-border bg-surface rounded-[var(--radius-card)] text-center space-y-4">
+          <div className="size-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto">
+            <CheckCircle2 className="size-6" />
           </div>
-          <div>
-            <h3 className="text-xl font-bold text-foreground">Message Dispatched!</h3>
-            <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-              We received your inquiry request. A Zorvate representative will review your scope specifications and reply shortly.
+          <div className="space-y-1">
+            <h3 className="text-base font-semibold text-foreground">Specification Received</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              We received your inquiry. An engineer will review your project requirements and reply within 24 hours.
             </p>
           </div>
           <Button
             onClick={() => setSuccess(false)}
             variant="outline"
-            className="rounded-xl border h-10 px-6 font-bold"
+            size="sm"
           >
             Send Another Message
           </Button>
-        </GlassCard>
+        </div>
       ) : (
-        <GlassCard
-          tilt={false}
-          className="p-6 sm:p-8 border bg-card/25"
-        >
+        <div className="p-8 border border-border bg-surface rounded-[var(--radius-card)] space-y-6">
           {errorMsg && (
-            <div className="p-3 text-xs bg-destructive/10 text-destructive rounded-xl border border-destructive/20 font-medium mb-6">
+            <div className="p-3 text-xs bg-destructive/10 text-destructive rounded-[var(--radius-sm)] border border-destructive/20 font-mono">
               {errorMsg}
             </div>
           )}
@@ -95,71 +88,68 @@ export function ContactForm() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name" className="mono-label text-[10px]">FULL NAME</Label>
                 <Input
                   id="name"
-                  placeholder="Your Name"
+                  placeholder="e.g. Alex Mercer"
                   type="text"
-                  className="mt-1 focus:ring-primary/20 focus:border-primary transition-all"
                   {...register("name")}
                 />
                 {errors.name && (
-                  <p className="text-xs text-destructive mt-1 font-medium">{errors.name.message}</p>
+                  <p className="text-[10px] font-mono text-destructive mt-1">{errors.name.message}</p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email" className="mono-label text-[10px]">EMAIL ADDRESS</Label>
                 <Input
                   id="email"
-                  placeholder="you@example.com"
+                  placeholder="alex@company.com"
                   type="email"
-                  className="mt-1 focus:ring-primary/20 focus:border-primary transition-all"
                   {...register("email")}
                 />
                 {errors.email && (
-                  <p className="text-xs text-destructive mt-1 font-medium">{errors.email.message}</p>
+                  <p className="text-[10px] font-mono text-destructive mt-1">{errors.email.message}</p>
                 )}
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="subject">Subject</Label>
+              <Label htmlFor="subject" className="mono-label text-[10px]">PROJECT SUBJECT</Label>
               <Input
                 id="subject"
-                placeholder="Project Scope Query"
+                placeholder="e.g. Next.js App Architecture & Sprints"
                 type="text"
-                className="mt-1 focus:ring-primary/20 focus:border-primary transition-all"
                 {...register("subject")}
               />
               {errors.subject && (
-                <p className="text-xs text-destructive mt-1 font-medium">{errors.subject.message}</p>
+                <p className="text-[10px] font-mono text-destructive mt-1">{errors.subject.message}</p>
               )}
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="message">Message Specifications</Label>
+              <Label htmlFor="message" className="mono-label text-[10px]">PROJECT SCOPE &amp; SPECIFICATIONS</Label>
               <Textarea
                 id="message"
-                placeholder="Describe your design and engineering roadmap goals..."
+                placeholder="Detail target milestones, budget, scope, and technical requirements..."
                 rows={5}
-                className="mt-1 focus:ring-primary/20 focus:border-primary transition-all"
                 {...register("message")}
               />
               {errors.message && (
-                <p className="text-xs text-destructive mt-1 font-medium">{errors.message.message}</p>
+                <p className="text-[10px] font-mono text-destructive mt-1">{errors.message.message}</p>
               )}
             </div>
 
             <Button
               type="submit"
               disabled={loading}
-              className="w-full mt-4 h-11 text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/10 transition-all duration-300"
+              size="lg"
+              className="w-full gap-2"
             >
-              {loading ? "Sending Message..." : "Send Inquiry"} <ArrowRight size={15} />
+              {loading ? "Transmitting..." : "Transmit Project Scope"} <ArrowUpRight className="size-4" />
             </Button>
           </form>
-        </GlassCard>
+        </div>
       )}
     </div>
   );
