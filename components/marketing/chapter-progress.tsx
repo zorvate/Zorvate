@@ -36,11 +36,9 @@ export function ChapterProgress() {
   }, []);
 
   return (
-    <div className="fixed bottom-6 left-6 z-40 hidden md:flex items-center gap-3 px-3.5 py-2 bg-[#121316]/90 border border-[#28292E] text-[#F5F4F0] font-mono text-[10px] uppercase tracking-[0.2em] shadow-md select-none backdrop-blur-sm">
+    <div className="fixed bottom-6 left-6 z-40 hidden md:flex items-center gap-2.5 px-3.5 py-2 bg-[#121316]/90 border border-[#28292E] text-[#F5F4F0] font-mono text-[10px] uppercase tracking-[0.2em] shadow-md select-none backdrop-blur-sm">
       <span className="signal-dot" style={{ width: 4, height: 4 }} />
-      <span className="text-[#8E8F94] hidden lg:inline">31.5204° N, 74.3587° E</span>
-      <span className="text-[#28292E] hidden lg:inline">/</span>
-      <span className="text-[#FF4D00] font-semibold">
+      <span className="text-[#F5F4F0] font-medium">
         {SECTIONS[activeIdx]?.tag || "OVERVIEW"}
       </span>
     </div>
