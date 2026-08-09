@@ -26,17 +26,13 @@ export function ProblemSection() {
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 py-20 md:py-28 lg:py-32">
 
         {/* Header Label */}
-        <div className="flex items-center justify-between pb-8 border-b border-[#E0DDD6]">
-          <div className="text-xs font-mono uppercase tracking-[0.18em] text-[#FF4D00] flex items-center gap-2">
-            <span className="signal-dot" />
-            SYSTEM DISCONNECT
-          </div>
-          <div className="text-xs font-mono uppercase tracking-[0.14em] text-[#5C5D61]">
-            FRAGMENTS VS ARCHITECTURE
-          </div>
+        <div className="pb-6 border-b border-[#E0DDD6]">
+          <h2 className="text-xs font-mono uppercase tracking-[0.2em] text-[#FF4D00]">
+            THE PROBLEM
+          </h2>
         </div>
 
-        {/* Main Statement — Asymmetric Editorial Grid */}
+        {/* Main Statement — Wide Asymmetric Editorial Grid */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -44,8 +40,8 @@ export function ProblemSection() {
           transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           className="py-12 md:py-16 grid gap-8 lg:grid-cols-12 lg:items-end"
         >
-          <div className="lg:col-span-8">
-            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-bold uppercase tracking-tight text-[#121316] leading-[1.02]">
+          <div className="lg:col-span-9">
+            <h3 className="text-3xl sm:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-[#121316] leading-[1.08]">
               YOUR BUSINESS{" "}
               <span className="text-[#5C5D61]">ALREADY HAS A SYSTEM.</span>
               <br />
@@ -54,10 +50,10 @@ export function ProblemSection() {
                 CONNECTED.
                 <span className="absolute bottom-1 left-0 w-full h-[3px] bg-[#FF4D00]" />
               </span>
-            </h2>
+            </h3>
           </div>
 
-          <div className="lg:col-span-4 space-y-4">
+          <div className="lg:col-span-3 space-y-4">
             <p className="text-sm text-[#5C5D61] leading-relaxed font-normal">
               Most businesses operate across isolated tools — spreadsheets, inboxes, manual messaging, untracked invoices. We replace fragments with connected digital infrastructure.
             </p>
@@ -146,7 +142,7 @@ export function ProblemSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-10 text-xs sm:text-sm text-[#5C5D61] max-w-xl leading-relaxed font-mono uppercase tracking-[0.1em]"
+          className="mt-12 text-base sm:text-lg text-[#121316] max-w-3xl leading-relaxed font-normal"
         >
           We don&apos;t sell websites. We engineer the digital infrastructure that makes your business operate as a connected system.
         </motion.p>

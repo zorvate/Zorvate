@@ -56,19 +56,11 @@ export function WhatWeEngineer() {
       className="py-20 md:py-28 lg:py-32 bg-[#F5F4F0] border-b border-[#E0DDD6] selection:bg-[#FF4D00]/20"
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-        {/* Chapter Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 md:pb-12 border-b border-[#E0DDD6] gap-4">
-          <div>
-            <div className="text-xs font-mono uppercase tracking-[0.18em] text-[#5C5D61] mb-2">
-              CAPABILITIES
-            </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-[#121316]">
-              WHAT WE ENGINEER
-            </h2>
-          </div>
-          <div className="text-xs font-mono uppercase tracking-[0.14em] text-[#5C5D61]">
-            04 CORE SYSTEM TYPES
-          </div>
+        {/* Section Header */}
+        <div className="pb-6 md:pb-8 border-b border-[#E0DDD6] mb-8">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-[#121316]">
+            WHAT WE ENGINEER
+          </h2>
         </div>
 
         {/* Editorial Rows */}

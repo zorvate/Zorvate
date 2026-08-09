@@ -53,15 +53,11 @@ export function ZorvateSystemSection() {
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 py-20 md:py-28 lg:py-32">
 
-        {/* Chapter Label */}
-        <div className="flex items-center justify-between pb-8 border-b border-[#28292E]">
-          <div className="text-xs font-mono uppercase tracking-[0.18em] text-[#F5F4F0] flex items-center gap-2">
-            <span className="signal-dot" />
-            TECHNICAL CONTROL LAYER
-          </div>
-          <div className="text-xs font-mono uppercase tracking-[0.14em] text-[#8E8F94]">
-            PROXIMITY-ACTIVATED FLOW
-          </div>
+        {/* Section Header */}
+        <div className="pb-6 border-b border-[#28292E]">
+          <h2 className="text-xs font-mono uppercase tracking-[0.2em] text-[#FF4D00]">
+            THE ZORVATE SYSTEM
+          </h2>
         </div>
 
         {/* Headline */}

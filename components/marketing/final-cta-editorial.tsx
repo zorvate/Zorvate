@@ -13,10 +13,9 @@ export function FinalCTAEditorial() {
 
       <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 py-20 md:py-28 lg:py-32">
 
-        {/* Chapter label */}
-        <div className="text-xs font-mono uppercase tracking-[0.18em] text-[#5C5D61] mb-6 flex items-center gap-2">
-          <span className="signal-dot" />
-          INITIATE / ENGAGEMENT
+        {/* Section label */}
+        <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#FF4D00] mb-8">
+          START A PROJECT
         </div>
 
         <div className="max-w-4xl space-y-6 md:space-y-8">

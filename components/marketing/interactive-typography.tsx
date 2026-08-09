@@ -124,16 +124,7 @@ export function InteractiveTypography() {
       className="py-20 md:py-28 lg:py-32 bg-[#F5F4F0] border-b border-[#E0DDD6] overflow-hidden select-none selection:bg-[#FF4D00]/20"
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-        {/* Chapter Header */}
-        <div className="flex items-center justify-between pb-8 border-b border-[#E0DDD6] mb-6">
-          <div className="text-xs font-mono uppercase tracking-[0.18em] text-[#FF4D00] flex items-center gap-2">
-            <span className="signal-dot" />
-            TYPOGRAPHIC FIELD
-          </div>
-          <div className="text-xs font-mono uppercase tracking-[0.14em] text-[#5C5D61]">
-            PHYSICAL RESPONSE SYSTEM
-          </div>
-        </div>
+
 
         {/* Massive Interactive Letter Field */}
         <div className="py-6 md:py-10 flex justify-between items-center w-full">
@@ -151,13 +142,10 @@ export function InteractiveTypography() {
         </div>
 
         {/* Sub-label */}
-        <div className="pt-6 border-t border-[#E0DDD6] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <p className="text-xs font-mono uppercase tracking-[0.14em] text-[#5C5D61]">
-            ENGINEERED AROUND YOUR BUSINESS OPERATIONAL CONSTRAINTS
+        <div className="pt-6 border-t border-[#E0DDD6]">
+          <p className="text-sm text-[#5C5D61] leading-relaxed">
+            Engineered around your business. Every system connected.
           </p>
-          <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-[#121316]">
-            PROXIMITY-REACTIVES / RESPONSIVE ARCHITECTURE
-          </div>
         </div>
       </div>
     </section>

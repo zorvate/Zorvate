@@ -73,20 +73,14 @@ export function CircularGallery() {
       className="py-20 md:py-28 lg:py-32 bg-[#F5F4F0] border-b border-[#E0DDD6] selection:bg-[#FF4D00]/20 overflow-hidden relative"
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-        {/* Chapter Header */}
+        {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 border-b border-[#E0DDD6] gap-4 mb-8">
           <div>
-            <div className="text-xs font-mono uppercase tracking-[0.18em] text-[#5C5D61] mb-2">
-              PORTFOLIO ARCHIVE / ORBITAL
-            </div>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-[#121316]">
               SELECTED WORK
             </h2>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="text-xs font-mono uppercase tracking-[0.14em] text-[#5C5D61]">
-              SUPABASE / ORBITAL GALLERY
-            </div>
+          <div>
             <Link
               href="/portfolio"
               className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.14em] text-[#121316] hover:text-[#FF4D00] transition-colors group"
